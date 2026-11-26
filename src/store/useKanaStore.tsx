@@ -41,6 +41,14 @@ interface KanaStoreContextType {
   setAudioEnabled: (val: boolean) => void;
   theme: ThemePreference;
   setTheme: (theme: ThemePreference) => void;
+  // Weak Spots Feature
+  weakSpots: Record<string, number>;
+  recordMistake: (id: string) => void;
+  recordSuccess: (id: string) => void;
+  clearWeakSpots: () => void;
+  weakSpotsCount: number;
+  weakSpotsItems: KanaItem[];
+  drillWeakSpots: () => void;
 }
 
 const STORAGE_KEY_SELECTION = 'hirakata_selected_ids_v1';
@@ -48,6 +56,7 @@ const STORAGE_KEY_AUTO_ADVANCE = 'hirakata_auto_advance';
 const STORAGE_KEY_FONT = 'hirakata_font_pref';
 const STORAGE_KEY_AUDIO = 'hirakata_audio_enabled';
 const STORAGE_KEY_THEME = 'hirakata_theme';
+const STORAGE_KEY_WEAK_SPOTS = 'hirakata_weak_spots_v1';
 
 // Preselect Hiragana 'a' column on very first visit
 const DEFAULT_PRESELECTED_IDS = hiraganaSingleColumns[0].items.map(item => item.id);
@@ -89,6 +98,16 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const saved = localStorage.getItem(STORAGE_KEY_THEME);
     if (saved === 'dark' || saved === 'cool') return saved;
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'cool';
+  });
+
+  // Weak Spots state
+  const [weakSpots, setWeakSpots] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_WEAK_SPOTS);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
 
   // Persist selections
@@ -286,6 +305,62 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [selectedIds]);
 
+  // Weak Spots Actions
+  const recordMistake = useCallback((id: string) => {
+    setWeakSpots(prev => {
+      const next = { ...prev, [id]: (prev[id] || 0) + 1 };
+      try {
+        localStorage.setItem(STORAGE_KEY_WEAK_SPOTS, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const recordSuccess = useCallback((id: string) => {
+    setWeakSpots(prev => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      if (next[id] <= 1) {
+        delete next[id];
+      } else {
+        next[id] -= 1;
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY_WEAK_SPOTS, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const clearWeakSpots = useCallback(() => {
+    setWeakSpots({});
+    try {
+      localStorage.removeItem(STORAGE_KEY_WEAK_SPOTS);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const weakSpotsItems = useMemo(() => {
+    const items: KanaItem[] = [];
+    for (const id of Object.keys(weakSpots)) {
+      const item = kanaMap.get(id);
+      if (item) items.push(item);
+    }
+    return items;
+  }, [weakSpots]);
+
+  const drillWeakSpots = useCallback(() => {
+    const ids = new Set(Object.keys(weakSpots));
+    if (ids.size > 0) {
+      setSelectedIds(ids);
+    }
+  }, [weakSpots]);
+
   const value = {
     selectedIds,
     toggleKana,
@@ -307,6 +382,13 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAudioEnabled,
     theme,
     setTheme,
+    weakSpots,
+    recordMistake,
+    recordSuccess,
+    clearWeakSpots,
+    weakSpotsCount: Object.keys(weakSpots).length,
+    weakSpotsItems,
+    drillWeakSpots,
   };
 
   return <KanaContext.Provider value={value}>{children}</KanaContext.Provider>;

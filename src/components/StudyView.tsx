@@ -38,6 +38,10 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     autoAdvance,
     setAutoAdvance,
     toggleColumn,
+    recordMistake,
+    recordSuccess,
+    weakSpotsCount,
+    drillWeakSpots,
   } = useKanaStore();
 
   // Queue of remaining cards to study in this session
@@ -100,8 +104,11 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
   // Handle Correct Answer
   const handleCorrect = useCallback(() => {
+    if (!currentCard) return;
+
     setFeedbackState('correct');
     playSuccessChime();
+    recordSuccess(currentCard.id);
 
     const newStreak = streak + 1;
     setStreak(newStreak);
@@ -124,7 +131,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         setCurrentIndex(prev => prev + 1);
       }
     }, 280);
-  }, [streak, bestStreak, currentIndex, deck.length]);
+  }, [currentCard, recordSuccess, streak, bestStreak, currentIndex, deck.length]);
 
   // Handle Mistake
   const handleMistake = useCallback(() => {
@@ -132,13 +139,14 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
     setFeedbackState('mistake');
     playMistakeChime();
+    recordMistake(currentCard.id);
     setStreak(0);
     setMistakeCount(prev => prev + 1);
     setMistakeAnswer(currentCard.displayRomaji);
 
     // Re-queue card to end of deck so user must repeat it
     setDeck(prev => [...prev, currentCard]);
-  }, [currentCard]);
+  }, [currentCard, recordMistake]);
 
   // Dismiss Mistake and continue
   const advanceAfterMistake = useCallback(() => {
@@ -167,8 +175,29 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     }
   };
 
-  // Handle Key Down (Enter, etc.)
+  // Handle Key Down (Keyboard shortcuts: Ctrl+Enter for audio, Tab to reveal answer/skip)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // 1. Shortcut: Ctrl+Enter or Cmd+Enter -> Play audio pronunciation
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      if (currentCard) {
+        speakKana(currentCard.char);
+      }
+      return;
+    }
+
+    // 2. Shortcut: Tab -> Reveal answer & log as weak spot / advance
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (feedbackState === 'idle' && currentCard) {
+        handleMistake();
+      } else if (feedbackState === 'mistake') {
+        advanceAfterMistake();
+      }
+      return;
+    }
+
+    // 3. Enter/Space to advance after mistake
     if (feedbackState === 'mistake') {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -177,6 +206,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
       return;
     }
 
+    // 4. Standard Enter submit
     if (e.key === 'Enter') {
       e.preventDefault();
       if (!currentCard || inputValue.trim() === '') return;
@@ -216,6 +246,18 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
           <div className="quick-presets">
             <span className="preset-label">Quick Start Options:</span>
             <div className="preset-buttons">
+              {weakSpotsCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    drillWeakSpots();
+                    startSession();
+                  }}
+                  className="preset-btn weak-spots-btn"
+                >
+                  🔥 Drill Weak Spots ({weakSpotsCount} characters)
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -327,6 +369,21 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         </div>
 
         <div className="hud-right">
+          {weakSpotsCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                drillWeakSpots();
+                startSession();
+              }}
+              className="hud-weak-spots-btn"
+              title="Drill only characters you struggled with"
+            >
+              <Flame size={14} className="text-flame" />
+              <span>Weak Spots ({weakSpotsCount})</span>
+            </button>
+          )}
+
           <div className="hud-metric" title="Current streak">
             <Flame size={16} className={streak > 0 ? 'text-flame' : 'text-muted'} />
             <span>{streak}</span>
@@ -416,13 +473,18 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             <div className="mistake-feedback-box">
               <div className="mistake-text">
                 <XCircle size={20} className="text-danger" />
-                <span>
-                  Correct answer:{' '}
-                  <strong>{currentCard?.char} = {mistakeAnswer}</strong>
-                  {currentCard?.romajiAnswers.length && currentCard.romajiAnswers.length > 1
-                    ? ` (or ${currentCard.romajiAnswers.filter(a => a !== mistakeAnswer).join(', ')})`
-                    : ''}
-                </span>
+                <div>
+                  <div>
+                    Correct answer:{' '}
+                    <strong>{currentCard?.char} = {mistakeAnswer}</strong>
+                    {currentCard?.romajiAnswers.length && currentCard.romajiAnswers.length > 1
+                      ? ` (or ${currentCard.romajiAnswers.filter(a => a !== mistakeAnswer).join(', ')})`
+                      : ''}
+                  </div>
+                  <div className="mistake-sub-note">
+                    Logged to Weak Spots • Press Tab or Enter to continue
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
@@ -454,11 +516,19 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
         {/* Hints / Instructions */}
         <div className="study-footer-hints">
-          <span>
-            {autoAdvance
-              ? 'Auto-advance enabled: correct answer advances instantly.'
-              : 'Press Enter to submit your answer.'}
-          </span>
+          <div className="shortcuts-hints-row">
+            <span>
+              <kbd className="hint-kbd">Ctrl+Enter</kbd> Audio
+            </span>
+            <span>•</span>
+            <span>
+              <kbd className="hint-kbd">Tab</kbd> Reveal Answer
+            </span>
+            <span>•</span>
+            <span>
+              {autoAdvance ? 'Auto-advances on match' : 'Press Enter to submit'}
+            </span>
+          </div>
         </div>
       </div>
     </div>
