@@ -94,11 +94,11 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
   useEffect(() => {
     if (loading || charsData.length === 0) return;
 
-    // Find the maximum strokes across the characters
+    // Find the maximum strokes across the characters (10% slower speed)
     const maxStrokes = Math.max(...charsData.map(c => c.paths.length));
-    const STROKE_DRAW_MS = 460;   // Time for each stroke to draw
-    const COMPLETE_PAUSE_MS = 650; // Pause with full character completed
-    const BLANK_PAUSE_MS = 250;    // Faint guide pause before starting next loop
+    const STROKE_DRAW_MS = 510;   // 10% slower draw duration
+    const COMPLETE_PAUSE_MS = 715; // Pause with full character completed
+    const BLANK_PAUSE_MS = 275;    // Faint guide pause before starting next loop
 
     let currentStep = 0;
     setIsResetting(false);
@@ -133,7 +133,7 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
     };
 
     // Start drawing stroke 1 after initial brief delay
-    timerRef.current = setTimeout(runStep, 150);
+    timerRef.current = setTimeout(runStep, 165);
 
     return () => {
       if (timerRef.current) {
@@ -173,7 +173,7 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
                 // Transition only when actively drawing, no transition on instant reset
                 const transitionStyle = isResetting
                   ? 'none'
-                  : 'stroke-dashoffset 0.42s ease-out';
+                  : 'stroke-dashoffset 0.46s ease-out';
 
                 return (
                   <path
@@ -183,6 +183,8 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
                     style={{
                       strokeDasharray: 100,
                       strokeDashoffset: offset,
+                      opacity: isDrawn ? 1 : 0,
+                      visibility: isDrawn ? 'visible' : 'hidden',
                       transition: transitionStyle,
                     }}
                   />
