@@ -7,102 +7,61 @@ import { StudyView } from './components/StudyView';
 const MainContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<MainTab>('hiragana');
 
-  // Intelligent mobile virtual keyboard listener with auto-dock tuck/restore
+  // Smart mobile virtual keyboard listener that auto-tucks the bottom dock
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     let baseHeight = Math.max(window.innerHeight, window.visualViewport?.height || 0);
     let lastWidth = window.innerWidth;
-    let wasKeyboardOpen = false;
 
-    const isKeyboardActive = (): boolean => {
-      // 1. Check navigator.virtualKeyboard API if available (Chromium / Android WebAPK)
-      if ('virtualKeyboard' in navigator && (navigator as any).virtualKeyboard?.boundingRect) {
-        const vkHeight = (navigator as any).virtualKeyboard.boundingRect.height;
-        if (typeof vkHeight === 'number') {
-          return vkHeight > 0;
-        }
-      }
-
-      // 2. Viewport height deficit against baseline height (handles Android resize)
-      const currentHeight = window.visualViewport?.height ?? window.innerHeight;
-      return (baseHeight - currentHeight) > 120;
-    };
-
-    const updateKeyboardState = () => {
+    const checkKeyboardState = () => {
       // Handle screen orientation rotation
       if (Math.abs(window.innerWidth - lastWidth) > 80) {
         lastWidth = window.innerWidth;
         baseHeight = Math.max(window.innerHeight, window.visualViewport?.height || 0);
       } else {
-        const isInputFocused =
-          document.activeElement instanceof HTMLInputElement ||
-          document.activeElement instanceof HTMLTextAreaElement;
-        // Keep baseHeight calibrated to full-screen when no input is focused
-        if (!isInputFocused && window.innerHeight > baseHeight) {
-          baseHeight = window.innerHeight;
+        // Expand baseHeight if screen grew larger
+        const h = Math.max(window.innerHeight, window.visualViewport?.height || 0);
+        if (h > baseHeight) {
+          baseHeight = h;
         }
       }
 
-      const active = isKeyboardActive();
+      // Check current visible height
+      const currentHeight = window.visualViewport?.height ?? window.innerHeight;
+      const heightDeficit = baseHeight - currentHeight;
 
-      if (active) {
-        wasKeyboardOpen = true;
+      // Check Chromium virtualKeyboard API if present
+      let vkHeight = 0;
+      if ('virtualKeyboard' in navigator && (navigator as any).virtualKeyboard?.boundingRect) {
+        vkHeight = (navigator as any).virtualKeyboard.boundingRect.height || 0;
+      }
+
+      // Keyboard is physically open if height shrunk by > 80px or virtualKeyboard reports height
+      const isKeyboardOpen = heightDeficit > 80 || vkHeight > 50;
+
+      if (isKeyboardOpen) {
         document.body.classList.add('keyboard-visible');
       } else {
         document.body.classList.remove('keyboard-visible');
-
-        // If keyboard was previously active and now dismissed (e.g. Android Back button or gesture),
-        // blur lingering input so bottom bar instantly re-appears without requiring any touch
-        if (wasKeyboardOpen) {
-          wasKeyboardOpen = false;
-          if (
-            document.activeElement instanceof HTMLInputElement ||
-            document.activeElement instanceof HTMLTextAreaElement
-          ) {
-            document.activeElement.blur();
-          }
-        }
       }
-    };
-
-    // Immediate reaction on focusin/focusout
-    const onFocusIn = (e: FocusEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        document.body.classList.add('keyboard-visible');
-        wasKeyboardOpen = true;
-      }
-    };
-
-    const onFocusOut = (e: FocusEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        setTimeout(updateKeyboardState, 100);
-      }
-    };
-
-    const onResize = () => {
-      updateKeyboardState();
     };
 
     const vk = (navigator as any).virtualKeyboard;
     if (vk) {
-      vk.addEventListener('geometrychange', onResize);
+      vk.addEventListener('geometrychange', checkKeyboardState);
     }
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', onResize);
+      window.visualViewport.addEventListener('resize', checkKeyboardState);
     }
-    window.addEventListener('resize', onResize);
-    document.addEventListener('focusin', onFocusIn);
-    document.addEventListener('focusout', onFocusOut);
+    window.addEventListener('resize', checkKeyboardState);
 
     return () => {
       if (vk) {
-        vk.removeEventListener('geometrychange', onResize);
+        vk.removeEventListener('geometrychange', checkKeyboardState);
       }
-      window.visualViewport?.removeEventListener('resize', onResize);
-      window.removeEventListener('resize', onResize);
-      document.removeEventListener('focusin', onFocusIn);
-      document.removeEventListener('focusout', onFocusOut);
+      window.visualViewport?.removeEventListener('resize', checkKeyboardState);
+      window.removeEventListener('resize', checkKeyboardState);
     };
   }, []);
 
