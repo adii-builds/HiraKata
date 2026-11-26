@@ -471,8 +471,9 @@ body {
   }
 }
 
-/* Smart Auto-Tuck: ONLY hidden when keyboard is physically active in viewport */
-body.keyboard-visible .mobile-bottom-dock {
+/* Smart Auto-Tuck: ONLY hidden when keyboard is active in viewport OR input focused */
+body.keyboard-visible .mobile-bottom-dock,
+body:has(.study-hero-input:focus) .mobile-bottom-dock {
   transform: translateY(120%);
   opacity: 0;
   pointer-events: none;
