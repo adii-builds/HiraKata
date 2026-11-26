@@ -569,19 +569,20 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             </div>
           </div>
 
+          {/* Dedicated Standalone 60s Blitz Mode Button (Laptop & Mobile) */}
+          <button
+            type="button"
+            onClick={startBlitz}
+            className="hud-standalone-blitz-btn"
+            title="Start 60-Second Speed Blitz drill"
+          >
+            <Zap size={14} className="text-gold" />
+            <span className="blitz-label-text">Blitz</span>
+            <span className="blitz-sub-pill">60s</span>
+          </button>
+
           {/* Quick Controls Section */}
           <div className="hud-controls-section">
-            {/* 60s Blitz Mode Button */}
-            <button
-              type="button"
-              onClick={startBlitz}
-              className="hud-action-pill blitz-pill"
-              title="Start 60-Second Speed Blitz drill"
-            >
-              <Zap size={13} className="text-gold" />
-              <span>Blitz (60s)</span>
-            </button>
-
             {/* Weak Spots Button */}
             {weakSpotsCount > 0 && (
               <button
@@ -604,7 +605,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               <span>{streak}</span>
             </div>
 
-            <div className="hud-metric-chip" title="Accuracy">
+            <div className="hud-metric-chip accuracy-chip" title="Accuracy">
               <span>{accuracy}%</span>
             </div>
 
@@ -631,7 +632,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         </div>
       )}
 
-      {/* Drawer: Settings Panel */}
+      {/* Drawer: Settings Panel (Blitz mode is standalone, removed from here) */}
       {!isBlitzMode && showSettingsDrawer && (
         <div className="study-settings-drawer">
           <div className="drawer-row">
@@ -664,19 +665,8 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               <option value="hand">Klee (Handwritten Brush)</option>
             </select>
           </div>
-          <div className="drawer-actions-grid">
-            <button
-              type="button"
-              onClick={() => {
-                setShowSettingsDrawer(false);
-                startBlitz();
-              }}
-              className="drawer-action-btn blitz-btn"
-            >
-              <Zap size={14} className="text-gold" />
-              <span>Start 60s Blitz Drill</span>
-            </button>
-            {weakSpotsCount > 0 && (
+          {weakSpotsCount > 0 && (
+            <div className="drawer-actions-grid">
               <button
                 type="button"
                 onClick={() => {
@@ -689,8 +679,8 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 <Flame size={14} className="text-flame" />
                 <span>Drill Weak Spots ({weakSpotsCount})</span>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 

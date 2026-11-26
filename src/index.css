@@ -32,6 +32,13 @@
   --text-muted: #6e6456;           /* Aged parchment slate */
   --text-subtle: #9c8e79;
 
+  /* Traditional Cinnabar Seal Stamp (Hanko 朱色・印鑑) */
+  --seal-primary: #b91c1c;
+  --seal-primary-hover: #991b1b;
+  --seal-border: #7f1d1d;
+  --seal-gradient: linear-gradient(135deg, #b91c1c 0%, #881337 100%);
+  --seal-glow: rgba(185, 28, 28, 0.35);
+
   /* Hiragana (Aizome Royal Indigo - 藍染) */
   --hira-primary: #3730a3;
   --hira-primary-hover: #2e2685;
@@ -110,6 +117,13 @@
   --text-secondary: #d6cbbe;       /* Pale parchment */
   --text-muted: #9c8e79;
   --text-subtle: #574839;
+
+  /* Traditional Cinnabar Seal Stamp (Dark Mode) */
+  --seal-primary: #dc2626;
+  --seal-primary-hover: #ef4444;
+  --seal-border: #991b1b;
+  --seal-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  --seal-glow: rgba(220, 38, 38, 0.45);
 
   /* Hiragana (Moonlit Indigo) */
   --hira-primary: #818cf8;
@@ -228,7 +242,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   4. Deep Lacquered Top Header Bar
+   4. Deep Lacquered Top Header Bar & Cinnabar Seal Brand
    -------------------------------------------------------------------------- */
 .app-top-header {
   position: sticky;
@@ -259,7 +273,7 @@ body {
   gap: 1rem;
 }
 
-/* Brand Group */
+/* Brand Group: Authentic Cinnabar Seal Stamp (Hanko 印鑑) */
 .brand-group {
   display: flex;
   align-items: center;
@@ -275,16 +289,19 @@ body {
 .brand-emblem {
   width: 36px;
   height: 36px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #4338ca 0%, #c2410c 100%);
+  border-radius: 8px;
+  /* Authentic Cinnabar Hanko Stamp Red with subtle gold edge */
+  background: var(--seal-gradient);
+  border: 1.5px solid rgba(251, 191, 36, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: #fffdfa;
   font-family: var(--font-gothic);
   font-size: 0.88rem;
-  font-weight: 700;
-  box-shadow: 0 2px 10px rgba(67, 56, 202, 0.5);
+  font-weight: 800;
+  box-shadow: 0 2px 10px var(--seal-glow);
+  letter-spacing: -0.05em;
 }
 
 .brand-text {
@@ -356,10 +373,12 @@ body {
     box-shadow: 0 2px 10px rgba(194, 65, 12, 0.5);
   }
 
+  /* Active Study Pill: Cinnabar & Gold Leaf Seal */
   .nav-tab-pill.active-study {
-    background: linear-gradient(135deg, #4338ca 0%, #c2410c 100%);
+    background: var(--seal-gradient);
     color: #ffffff;
-    box-shadow: 0 4px 14px rgba(67, 56, 202, 0.5);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    box-shadow: 0 4px 14px var(--seal-glow);
   }
 }
 
@@ -432,7 +451,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   5. Mobile Bottom Floating Navigation Dock
+   5. Mobile Bottom Floating Navigation Dock (Smart Viewport-Tuck)
    -------------------------------------------------------------------------- */
 .mobile-bottom-dock {
   display: block;
@@ -452,8 +471,8 @@ body {
   }
 }
 
-/* Auto-tuck dock when typing */
-body:has(.study-hero-input:focus) .mobile-bottom-dock {
+/* Smart Auto-Tuck: ONLY hidden when keyboard is physically active in viewport */
+body.keyboard-visible .mobile-bottom-dock {
   transform: translateY(120%);
   opacity: 0;
   pointer-events: none;
@@ -532,7 +551,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   background: var(--kata-soft-bg);
 }
 
-/* Elevated Study Button in Mobile Dock */
+/* Elevated Study Button in Mobile Dock (Cinnabar Seal Stamp Red) */
 .dock-study-btn {
   padding: 0;
 }
@@ -552,10 +571,10 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 .dock-study-btn.ready .dock-study-pill {
-  background: linear-gradient(135deg, var(--hira-primary) 0%, var(--kata-primary) 100%);
+  background: var(--seal-gradient);
   color: #ffffff;
-  border: none;
-  box-shadow: 0 4px 14px var(--hira-glow);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 4px 14px var(--seal-glow);
 }
 
 .dock-study-counter {
@@ -568,7 +587,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 /* --------------------------------------------------------------------------
-   6. Kana Grid View & Category Segmented Bar
+   6. Kana Grid View & Category Segmented Bar (Desktop + Compact Mobile)
    -------------------------------------------------------------------------- */
 .kana-grid-layout {
   max-width: 1200px;
@@ -583,7 +602,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   }
 }
 
-/* Distinct Header Panels for Hiragana & Katakana */
+/* Header Panels: Desktop */
 .kana-grid-header {
   border-radius: 20px;
   padding: 1.25rem 1.5rem;
@@ -592,6 +611,65 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+/* Compact, non-bulky Header on Mobile */
+@media (max-width: 767px) {
+  .kana-grid-layout {
+    padding: 0.65rem 0.6rem;
+  }
+
+  .kana-grid-header {
+    padding: 0.65rem 0.85rem;
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    gap: 0.65rem;
+  }
+
+  .header-meta {
+    gap: 0.45rem !important;
+  }
+
+  .meta-left {
+    gap: 0.5rem !important;
+  }
+
+  .script-title {
+    font-size: 1.25rem !important;
+  }
+
+  .script-kanji {
+    font-size: 0.95rem !important;
+  }
+
+  .script-count-chip {
+    font-size: 0.72rem !important;
+    padding: 0.15rem 0.55rem !important;
+  }
+
+  .meta-actions {
+    gap: 0.35rem !important;
+  }
+
+  .pill-action-btn {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.74rem !important;
+  }
+
+  .category-segmented-bar {
+    padding: 2px !important;
+    gap: 2px !important;
+  }
+
+  .category-pill-tab {
+    padding: 0.32rem 0.75rem !important;
+    font-size: 0.76rem !important;
+  }
+
+  .cat-count-bubble {
+    font-size: 0.65rem !important;
+    padding: 1px 4px !important;
+  }
 }
 
 .script-hiragana .kana-grid-header {
@@ -763,7 +841,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 /* --------------------------------------------------------------------------
-   7. Kana Column Decks & Tactile Tiles (Desktop + Compact Mobile)
+   7. Kana Column Decks & Tactile Tiles (Desktop + Compact Agile Mobile)
    -------------------------------------------------------------------------- */
 .kana-decks-viewport {
   width: 100%;
@@ -781,7 +859,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .kana-decks-container {
-    gap: 0.45rem; /* Tight, agile spacing on mobile */
+    gap: 0.35rem; /* Tight spacing on mobile */
   }
 }
 
@@ -800,7 +878,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .kana-column-deck {
-    gap: 0.35rem;
+    gap: 0.3rem;
   }
 }
 
@@ -823,9 +901,9 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .column-deck-header {
-    padding: 0.3rem 0.35rem;
-    font-size: 0.72rem;
-    border-radius: 8px;
+    padding: 0.25rem 0.3rem;
+    font-size: 0.68rem;
+    border-radius: 7px;
   }
 }
 
@@ -871,11 +949,11 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .column-deck-tiles {
-    gap: 0.35rem;
+    gap: 0.3rem;
   }
 }
 
-/* Tactile Kana Tile: Laptop vs. Mobile */
+/* Tactile Kana Tile: Laptop vs. Slim Mobile Squircles */
 .kana-card-tile {
   width: 58px;
   height: 68px;
@@ -900,12 +978,12 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   }
 }
 
-/* Sleek, agile proportion on mobile (no longer bulky!) */
+/* Slim, agile proportion on mobile (no longer bulky!) */
 @media (max-width: 767px) {
   .kana-card-tile {
-    width: clamp(40px, 11vw, 46px);
-    height: clamp(48px, 13.5vw, 56px);
-    border-radius: 10px;
+    width: clamp(38px, 10.5vw, 44px);
+    height: clamp(46px, 12.5vw, 52px);
+    border-radius: 9px;
     box-shadow: var(--shadow-xs);
   }
 }
@@ -937,7 +1015,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .tile-kana {
-    font-size: clamp(1.15rem, 3.8vw, 1.35rem);
+    font-size: clamp(1.1rem, 3.4vw, 1.25rem);
   }
 }
 
@@ -950,7 +1028,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .tile-romaji {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
 }
 
@@ -993,7 +1071,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 /* --------------------------------------------------------------------------
-   8. Study Arena & Dynamic Adaptive Viewport
+   8. Study Arena & Standalone Blitz Mode Button
    -------------------------------------------------------------------------- */
 .study-zen-layout {
   display: flex;
@@ -1041,10 +1119,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
     flex-wrap: nowrap; /* Single un-wrapped line on mobile */
   }
 
-  /* Hide direct Blitz & Weak spots buttons from HUD on mobile (they are inside drawer ⚙) */
-  .hud-controls-section .blitz-pill,
-  .hud-controls-section .weak-spots-pill,
-  .hud-controls-section .hud-metric-chip:not(:first-of-type) {
+  .hud-controls-section .weak-spots-pill {
     display: none !important;
   }
 }
@@ -1105,6 +1180,43 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   transition: width 0.25s ease-out;
 }
 
+/* Dedicated Standalone Blitz Mode Button (Visible on Laptop & Mobile) */
+.hud-standalone-blitz-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--blitz-gold);
+  background: var(--blitz-soft-bg);
+  color: var(--blitz-gold);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--blitz-glow);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.hud-standalone-blitz-btn:hover {
+  background: var(--blitz-gold);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--blitz-glow);
+}
+
+.hud-standalone-blitz-btn:hover .text-gold {
+  color: #ffffff;
+}
+
+.blitz-sub-pill {
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(180, 83, 9, 0.18);
+  color: inherit;
+}
+
 .hud-controls-section {
   display: flex;
   align-items: center;
@@ -1124,12 +1236,6 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   font-weight: 800;
   cursor: pointer;
   transition: all 0.15s ease;
-}
-
-.blitz-pill {
-  color: var(--blitz-gold);
-  border-color: var(--blitz-soft-border);
-  background: var(--blitz-soft-bg);
 }
 
 .weak-spots-pill {
@@ -1282,8 +1388,8 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 .drawer-actions-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   margin-top: 0.25rem;
   padding-top: 0.5rem;
@@ -1295,11 +1401,11 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.85rem;
   border-radius: 12px;
   border: 1.5px solid var(--border-medium);
   background: var(--bg-surface-subtle);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--text-main);
   cursor: pointer;
@@ -1308,12 +1414,6 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 .drawer-action-btn:hover {
   background: var(--bg-surface-hover);
-}
-
-.drawer-action-btn.blitz-btn {
-  background: var(--blitz-soft-bg);
-  border-color: var(--blitz-soft-border);
-  color: var(--blitz-gold);
 }
 
 .drawer-action-btn.weak-btn {
@@ -1852,6 +1952,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   background: var(--bg-surface-hover);
 }
 
+/* Primary Button in Cinnabar Seal Red */
 .primary-zen-btn {
   flex: 1;
   display: inline-flex;
@@ -1860,13 +1961,13 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   gap: 0.45rem;
   padding: 0.75rem 1rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--hira-primary) 0%, var(--kata-primary) 100%);
+  background: var(--seal-gradient);
   color: #ffffff;
-  border: none;
+  border: 1px solid rgba(251, 191, 36, 0.4);
   font-size: 0.88rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 14px var(--hira-glow);
+  box-shadow: 0 4px 14px var(--seal-glow);
   transition: all 0.15s ease;
 }
 
