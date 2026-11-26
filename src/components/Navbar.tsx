@@ -41,7 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
             onClick={() => onSelectTab('hiragana')}
             className={`main-tab-btn ${currentTab === 'hiragana' ? 'active' : ''}`}
           >
-            <span>Hiragana</span>
+            <span className="tab-text-full">Hiragana</span>
+            <span className="tab-text-short">Hira</span>
             {counts.hiragana > 0 && <span className="tab-badge">{counts.hiragana}</span>}
           </button>
 
@@ -50,7 +51,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
             onClick={() => onSelectTab('katakana')}
             className={`main-tab-btn ${currentTab === 'katakana' ? 'active' : ''}`}
           >
-            <span>Katakana</span>
+            <span className="tab-text-full">Katakana</span>
+            <span className="tab-text-short">Kata</span>
             {counts.katakana > 0 && <span className="tab-badge">{counts.katakana}</span>}
           </button>
 

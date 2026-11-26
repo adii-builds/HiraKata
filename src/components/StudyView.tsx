@@ -726,6 +726,9 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
+                onFocus={e => {
+                  e.target.scrollIntoView({ block: 'nearest' });
+                }}
                 placeholder={
                   isBlitzMode
                     ? kanaConversion

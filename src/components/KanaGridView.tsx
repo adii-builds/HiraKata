@@ -20,16 +20,16 @@ export const KanaGridView: React.FC<KanaGridViewProps> = ({ script }) => {
   const [activeCategory, setActiveCategory] = useState<CategoryType>('single');
   const { toggleCategory, isCategorySelected, toggleScript, isScriptSelected, counts } = useKanaStore();
 
-  const categories: { key: CategoryType; label: string }[] =
+  const categories: { key: CategoryType; label: string; shortLabel: string }[] =
     script === 'hiragana'
       ? [
-          { key: 'single', label: 'Single Characters' },
-          { key: 'double', label: 'Double Characters' },
+          { key: 'single', label: 'Single Characters', shortLabel: 'Single' },
+          { key: 'double', label: 'Double Characters', shortLabel: 'Double' },
         ]
       : [
-          { key: 'single', label: 'Single Characters' },
-          { key: 'double', label: 'Double Characters' },
-          { key: 'extended', label: 'Extended Characters' },
+          { key: 'single', label: 'Single Characters', shortLabel: 'Single' },
+          { key: 'double', label: 'Double Characters', shortLabel: 'Double' },
+          { key: 'extended', label: 'Extended Characters', shortLabel: 'Extended' },
         ];
 
   // Active columns
@@ -61,7 +61,8 @@ export const KanaGridView: React.FC<KanaGridViewProps> = ({ script }) => {
               onClick={() => setActiveCategory(cat.key)}
               className={`subnav-tab ${activeCategory === cat.key ? 'active' : ''}`}
             >
-              {cat.label}
+              <span className="tab-label-full">{cat.label}</span>
+              <span className="tab-label-short">{cat.shortLabel}</span>
             </button>
           ))}
         </div>
@@ -97,7 +98,8 @@ export const KanaGridView: React.FC<KanaGridViewProps> = ({ script }) => {
             ) : (
               <Square size={16} />
             )}
-            <span>All {script === 'hiragana' ? 'Hiragana' : 'Katakana'} ({scriptCount})</span>
+            <span className="btn-label-full">All {script === 'hiragana' ? 'Hiragana' : 'Katakana'} ({scriptCount})</span>
+            <span className="btn-label-short">All ({scriptCount})</span>
           </button>
         </div>
       </div>

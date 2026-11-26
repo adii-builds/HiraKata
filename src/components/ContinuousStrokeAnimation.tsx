@@ -138,8 +138,6 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
           <svg
             viewBox="0 0 109 109"
             className="continuous-stroke-svg"
-            width="64"
-            height="64"
           >
             {/* Background faint guide paths */}
             <g className="stroke-guide-layer">
