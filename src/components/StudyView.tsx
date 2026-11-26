@@ -18,6 +18,7 @@ import {
   Trophy,
   Timer,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface StudyViewProps {
@@ -551,6 +552,15 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         <div className="study-hud-bar">
           {/* Progress Section */}
           <div className="hud-progress-section">
+            <button
+              type="button"
+              onClick={() => onGoToTab(currentCard?.script || 'hiragana')}
+              className="hud-back-btn"
+              title="Return to Kana Decks"
+            >
+              <ArrowLeft size={14} />
+              <span>Decks</span>
+            </button>
             <span className="hud-step-tag">
               Card <strong>{currentIndex + 1}</strong> of {totalCards}
             </span>
@@ -666,10 +676,25 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         >
           {/* Card Meta Header */}
           <div className="card-meta-tags">
-            <span className={`tag-script script-${currentCard?.script}`}>
-              {currentCard?.script.toUpperCase()}
-            </span>
-            <span className="tag-category">{currentCard?.category.toUpperCase()}</span>
+            <div className="meta-tags-left">
+              <span className={`tag-script script-${currentCard?.script}`}>
+                {currentCard?.script.toUpperCase()}
+              </span>
+              <span className="tag-category">{currentCard?.category.toUpperCase()}</span>
+            </div>
+
+            {/* Dedicated Audio Listen Button in header */}
+            <button
+              type="button"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => currentCard && speakKana(currentCard.char)}
+              className="card-audio-pill"
+              title="Listen to Japanese pronunciation (Ctrl+Enter)"
+              aria-label="Listen to Japanese pronunciation"
+            >
+              <Volume2 size={15} />
+              <span className="audio-label">Listen</span>
+            </button>
           </div>
 
           {/* Main Kana Glyph */}
@@ -683,19 +708,6 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               <ContinuousStrokeAnimation char={currentCard.char} />
             </div>
           )}
-
-          {/* Dedicated Audio Listen Button */}
-          <button
-            type="button"
-            onMouseDown={e => e.preventDefault()}
-            onClick={() => currentCard && speakKana(currentCard.char)}
-            className="card-audio-pill"
-            title="Listen to Japanese pronunciation (Ctrl+Enter)"
-            aria-label="Listen to Japanese pronunciation"
-          >
-            <Volume2 size={16} />
-            <span className="audio-label">Listen</span>
-          </button>
         </div>
 
         {/* Dynamic Response Field Dock */}
@@ -731,9 +743,6 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                onFocus={e => {
-                  e.target.scrollIntoView({ block: 'nearest' });
-                }}
                 placeholder={
                   isBlitzMode
                     ? kanaConversion

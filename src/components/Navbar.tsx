@@ -30,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
   return (
     <>
       {/* Top Application Header */}
-      <header className="app-top-header">
+      <header className={`app-top-header ${currentTab === 'study' ? 'is-study-mode' : ''}`}>
         <div className="header-inner">
           {/* Brand Logo */}
           <div className="brand-group" onClick={() => onSelectTab('hiragana')}>
