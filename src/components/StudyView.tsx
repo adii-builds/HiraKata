@@ -14,6 +14,10 @@ import {
   XCircle,
   ArrowRight,
   Sliders,
+  Zap,
+  Trophy,
+  Timer,
+  X,
 } from 'lucide-react';
 
 interface StudyViewProps {
@@ -64,6 +68,28 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
 
+  // Blitz Mode State
+  const STORAGE_KEY_BLITZ_HIGHSCORE = 'hirakata_blitz_highscore_v1';
+  const [isBlitzMode, setIsBlitzMode] = useState<boolean>(false);
+  const [blitzTimeLeft, setBlitzTimeLeft] = useState<number>(60);
+  const [blitzScore, setBlitzScore] = useState<number>(0);
+  const [blitzMistakes, setBlitzMistakes] = useState<number>(0);
+  const [blitzHighScore, setBlitzHighScore] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_BLITZ_HIGHSCORE);
+      return saved ? parseInt(saved, 10) || 0 : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [showBlitzSummary, setShowBlitzSummary] = useState<boolean>(false);
+  const [isNewHighScore, setIsNewHighScore] = useState<boolean>(false);
+
+  const blitzScoreRef = useRef<number>(blitzScore);
+  blitzScoreRef.current = blitzScore;
+  const blitzMistakesRef = useRef<number>(blitzMistakes);
+  blitzMistakesRef.current = blitzMistakes;
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Initialize or restart study session
@@ -85,25 +111,112 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     setStreak(0);
     setBestStreak(0);
     setIsCompleted(false);
+    setIsBlitzMode(false);
+    setShowBlitzSummary(false);
   }, [selectedItems]);
+
+  // Finish Blitz Mode
+  const finishBlitz = useCallback((finalScore: number, _finalMistakes: number) => {
+    setIsBlitzMode(false);
+    setShowBlitzSummary(true);
+
+    let prevBest = 0;
+    try {
+      prevBest = parseInt(localStorage.getItem(STORAGE_KEY_BLITZ_HIGHSCORE) || '0', 10) || 0;
+    } catch {
+      // ignore
+    }
+
+    if (finalScore > prevBest) {
+      setIsNewHighScore(true);
+      setBlitzHighScore(finalScore);
+      try {
+        localStorage.setItem(STORAGE_KEY_BLITZ_HIGHSCORE, String(finalScore));
+      } catch {
+        // ignore
+      }
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.5 },
+      });
+    } else {
+      setIsNewHighScore(false);
+      if (finalScore > 0) {
+        confetti({
+          particleCount: 60,
+          spread: 60,
+          origin: { y: 0.6 },
+        });
+      }
+    }
+  }, []);
+
+  // Blitz Countdown Timer
+  useEffect(() => {
+    if (!isBlitzMode) return;
+
+    const timer = setInterval(() => {
+      setBlitzTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          finishBlitz(blitzScoreRef.current, blitzMistakesRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isBlitzMode, finishBlitz]);
+
+  // Start 60-Second Blitz Mode
+  const startBlitz = useCallback(() => {
+    if (selectedItems.length === 0) return;
+
+    let queue = shuffleArray(selectedItems);
+    while (queue.length < 50) {
+      queue = [...queue, ...shuffleArray(selectedItems)];
+    }
+
+    setDeck(queue);
+    setCurrentIndex(0);
+    setInputValue('');
+    setFeedbackState('idle');
+    setMistakeAnswer(null);
+    setBlitzScore(0);
+    setBlitzMistakes(0);
+    setBlitzTimeLeft(60);
+    setIsNewHighScore(false);
+    setShowBlitzSummary(false);
+    setIsCompleted(false);
+    setIsBlitzMode(true);
+    setTimeout(() => inputRef.current?.focus(), 60);
+  }, [selectedItems]);
+
+  // Exit Blitz Mode
+  const exitBlitz = useCallback(() => {
+    setIsBlitzMode(false);
+    setShowBlitzSummary(false);
+    startSession();
+  }, [startSession]);
 
   // Restart session when selectedItems length changes drastically from 0
   useEffect(() => {
-    if (deck.length === 0 && selectedItems.length > 0) {
+    if (deck.length === 0 && selectedItems.length > 0 && !isBlitzMode) {
       startSession();
     }
-  }, [selectedItems.length, deck.length, startSession]);
+  }, [selectedItems.length, deck.length, startSession, isBlitzMode]);
 
   // Current Card
   const currentCard: KanaItem | undefined = deck[currentIndex];
 
   // Auto-focus input
   useEffect(() => {
-    if (!isCompleted && feedbackState === 'idle') {
+    if (!isCompleted && !showBlitzSummary && feedbackState === 'idle') {
       inputRef.current?.focus();
     }
-  }, [currentIndex, isCompleted, feedbackState]);
-
+  }, [currentIndex, isCompleted, showBlitzSummary, feedbackState]);
 
   // Handle Correct Answer
   const handleCorrect = useCallback(() => {
@@ -112,6 +225,22 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     setFeedbackState('correct');
     playSuccessChime();
     recordSuccess(currentCard.id);
+
+    if (isBlitzMode) {
+      setBlitzScore(prev => prev + 1);
+      setTimeout(() => {
+        setInputValue('');
+        setFeedbackState('idle');
+        setDeck(prevDeck => {
+          if (currentIndex + 5 >= prevDeck.length) {
+            return [...prevDeck, ...shuffleArray(selectedItems)];
+          }
+          return prevDeck;
+        });
+        setCurrentIndex(prev => prev + 1);
+      }, 120);
+      return;
+    }
 
     const newStreak = streak + 1;
     setStreak(newStreak);
@@ -134,7 +263,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         setCurrentIndex(prev => prev + 1);
       }
     }, 280);
-  }, [currentCard, recordSuccess, streak, bestStreak, currentIndex, deck.length]);
+  }, [currentCard, recordSuccess, isBlitzMode, currentIndex, selectedItems, streak, bestStreak, deck.length]);
 
   // Handle Mistake
   const handleMistake = useCallback(() => {
@@ -143,15 +272,33 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     setFeedbackState('mistake');
     playMistakeChime();
     recordMistake(currentCard.id);
+
+    if (isBlitzMode) {
+      setBlitzMistakes(prev => prev + 1);
+      // In blitz, quickly advance after 300ms so timer isn't blocked
+      setTimeout(() => {
+        setInputValue('');
+        setFeedbackState('idle');
+        setDeck(prevDeck => {
+          if (currentIndex + 5 >= prevDeck.length) {
+            return [...prevDeck, ...shuffleArray(selectedItems)];
+          }
+          return prevDeck;
+        });
+        setCurrentIndex(prev => prev + 1);
+      }, 300);
+      return;
+    }
+
     setStreak(0);
     setMistakeCount(prev => prev + 1);
     setMistakeAnswer(currentCard.displayRomaji);
 
     // Re-queue card to end of deck so user must repeat it
     setDeck(prev => [...prev, currentCard]);
-  }, [currentCard, recordMistake]);
+  }, [currentCard, recordMistake, isBlitzMode, currentIndex, selectedItems]);
 
-  // Dismiss Mistake and continue
+  // Dismiss Mistake and continue (Normal study mode)
   const advanceAfterMistake = useCallback(() => {
     setInputValue('');
     setFeedbackState('idle');
@@ -200,6 +347,10 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     // 2. Shortcut: Tab -> Reveal answer & log as weak spot / advance
     if (e.key === 'Tab') {
       e.preventDefault();
+      if (isBlitzMode) {
+        handleMistake();
+        return;
+      }
       if (feedbackState === 'idle' && currentCard) {
         handleMistake();
       } else if (feedbackState === 'mistake') {
@@ -370,64 +521,106 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
   return (
     <div className="study-workspace">
-      {/* Top HUD: Progress & Stats */}
-      <div className="study-hud">
-        <div className="hud-left">
-          <span className="hud-counter">
-            Card <strong>{currentIndex + 1}</strong> of {totalCards}
-          </span>
-          <div className="hud-progress-bar">
-            <div className="hud-progress-fill" style={{ width: `${progressPercent}%` }} />
+      {/* Top HUD: Blitz Active vs Normal */}
+      {isBlitzMode ? (
+        <div className="study-hud blitz-hud-active">
+          <div className="hud-left">
+            <span className="blitz-badge-active">
+              <Zap size={14} className="text-blitz" />
+              <span>60s BLITZ</span>
+            </span>
+            <span className="blitz-score-pill">
+              Score: <strong>{blitzScore}</strong>
+            </span>
           </div>
-        </div>
 
-        <div className="hud-right">
-          {weakSpotsCount > 0 && (
+          <div className="hud-right">
+            <div className={`blitz-timer-pill ${blitzTimeLeft <= 10 ? 'timer-critical' : ''}`}>
+              <Timer size={15} />
+              <span>{blitzTimeLeft}s</span>
+            </div>
+
             <button
               type="button"
-              onClick={() => {
-                drillWeakSpots();
-                startSession();
-              }}
-              className="hud-weak-spots-btn"
-              title="Drill only characters you struggled with"
+              onClick={exitBlitz}
+              className="blitz-exit-btn"
+              title="Exit Blitz Mode"
             >
-              <Flame size={14} className="text-flame" />
-              <span>Weak Spots ({weakSpotsCount})</span>
+              <X size={15} />
+              <span>Exit</span>
             </button>
-          )}
-
-          <div className="hud-metric" title="Current streak">
-            <Flame size={16} className={streak > 0 ? 'text-flame' : 'text-muted'} />
-            <span>{streak}</span>
           </div>
-
-          <div className="hud-metric" title="Accuracy">
-            <span>{accuracy}%</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setKanaConversion(!kanaConversion)}
-            className={`hud-mode-toggle-btn ${kanaConversion ? 'active' : ''}`}
-            title={`Input mode: ${kanaConversion ? 'Kana IME Conversion' : 'Direct Rōmaji'}`}
-          >
-            <span>{kanaConversion ? 'かな' : 'ROMAJI'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowSettingsDrawer(prev => !prev)}
-            className="hud-settings-toggle"
-            title="Study options"
-          >
-            <Sliders size={16} />
-          </button>
         </div>
-      </div>
+      ) : (
+        <div className="study-hud">
+          <div className="hud-left">
+            <span className="hud-counter">
+              Card <strong>{currentIndex + 1}</strong> of {totalCards}
+            </span>
+            <div className="hud-progress-bar">
+              <div className="hud-progress-fill" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+
+          <div className="hud-right">
+            {/* 60s Blitz button */}
+            <button
+              type="button"
+              onClick={startBlitz}
+              className="hud-blitz-btn"
+              title="Start 60-Second Speed Blitz mode"
+            >
+              <Zap size={14} className="text-blitz" />
+              <span>60s Blitz</span>
+            </button>
+
+            {weakSpotsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  drillWeakSpots();
+                  startSession();
+                }}
+                className="hud-weak-spots-btn"
+                title="Drill only characters you struggled with"
+              >
+                <Flame size={14} className="text-flame" />
+                <span>Weak Spots ({weakSpotsCount})</span>
+              </button>
+            )}
+
+            <div className="hud-metric" title="Current streak">
+              <Flame size={16} className={streak > 0 ? 'text-flame' : 'text-muted'} />
+              <span>{streak}</span>
+            </div>
+
+            <div className="hud-metric" title="Accuracy">
+              <span>{accuracy}%</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setKanaConversion(!kanaConversion)}
+              className={`hud-mode-toggle-btn ${kanaConversion ? 'active' : ''}`}
+              title={`Input mode: ${kanaConversion ? 'Kana IME Conversion' : 'Direct Rōmaji'}`}
+            >
+              <span>{kanaConversion ? 'かな' : 'ROMAJI'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowSettingsDrawer(prev => !prev)}
+              className="hud-settings-toggle"
+              title="Study options"
+            >
+              <Sliders size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Settings Drawer (Options) */}
-      {showSettingsDrawer && (
+      {!isBlitzMode && showSettingsDrawer && (
         <div className="study-options-panel">
           <div className="option-row">
             <span>Auto-advance on match</span>
@@ -499,7 +692,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
         {/* Input & Feedback Area */}
         <div className="study-input-container">
-          {feedbackState === 'mistake' ? (
+          {feedbackState === 'mistake' && !isBlitzMode ? (
             <div className="mistake-feedback-box">
               <div className="mistake-text">
                 <XCircle size={20} className="text-danger" />
@@ -534,7 +727,11 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={
-                  kanaConversion
+                  isBlitzMode
+                    ? kanaConversion
+                      ? `⚡ Blitz! Type in ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}...`
+                      : '⚡ Blitz! Quick rōmaji...'
+                    : kanaConversion
                     ? `Type rōmaji (converts to ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'})...`
                     : 'Type the rōmaji equivalent...'
                 }
@@ -551,6 +748,14 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         {/* Hints / Instructions */}
         <div className="study-footer-hints">
           <div className="shortcuts-hints-row">
+            {isBlitzMode && (
+              <>
+                <span className="hud-blitz-badge-hint">
+                  <Zap size={13} className="text-blitz" /> 60s Blitz Mode
+                </span>
+                <span>•</span>
+              </>
+            )}
             {kanaConversion && (
               <>
                 <span className="hud-ime-badge">
@@ -564,7 +769,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             </span>
             <span>•</span>
             <span>
-              <kbd className="hint-kbd">Tab</kbd> Reveal Answer
+              <kbd className="hint-kbd">Tab</kbd> {isBlitzMode ? 'Skip' : 'Reveal Answer'}
             </span>
             <span>•</span>
             <span>
@@ -573,6 +778,70 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
           </div>
         </div>
       </div>
+
+      {/* Blitz Summary Modal */}
+      {showBlitzSummary && (
+        <div className="blitz-modal-overlay">
+          <div className="blitz-modal-card">
+            <div className="blitz-modal-icon">
+              {isNewHighScore ? (
+                <Trophy size={48} className="text-trophy" />
+              ) : (
+                <Zap size={48} className="text-blitz" />
+              )}
+            </div>
+
+            <h2>{isNewHighScore ? '🎉 New High Score!' : '⚡ 60s Blitz Complete!'}</h2>
+            <p className="blitz-modal-subtitle">
+              {isNewHighScore
+                ? `Incredible speed! You set a new personal record with ${blitzScore} kana!`
+                : 'Great speed drilling session! Keep up the momentum.'}
+            </p>
+
+            <div className="blitz-stats-grid">
+              <div className="stat-box">
+                <span className="stat-val">{blitzScore}</span>
+                <span className="stat-lbl">Kana Solved</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-val">{blitzScore}</span>
+                <span className="stat-lbl">KPM (Speed)</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-val">
+                  {blitzScore + blitzMistakes > 0
+                    ? Math.round((blitzScore / (blitzScore + blitzMistakes)) * 100)
+                    : 100}%
+                </span>
+                <span className="stat-lbl">Accuracy</span>
+              </div>
+            </div>
+
+            <div className="blitz-highscore-banner">
+              <Trophy size={16} className="text-trophy" />
+              <span>Personal Best: <strong>{blitzHighScore}</strong> kana / min</span>
+            </div>
+
+            <div className="blitz-modal-actions">
+              <button
+                type="button"
+                onClick={startBlitz}
+                className="primary-action-btn blitz-restart-btn"
+              >
+                <Zap size={16} />
+                <span>Play Again</span>
+              </button>
+              <button
+                type="button"
+                onClick={exitBlitz}
+                className="secondary-action-btn"
+              >
+                Back to Normal Drill
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

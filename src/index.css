@@ -1089,5 +1089,245 @@ html, body {
   stroke-linejoin: round;
 }
 
+/* ========================================================
+   60-SECOND SPEED BLITZ MODE
+   ======================================================== */
+.text-blitz {
+  color: #f59e0b;
+}
+
+.text-trophy {
+  color: #eab308;
+}
+
+/* Trigger button in normal HUD */
+.hud-blitz-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid #f59e0b;
+  border-radius: 999px;
+  color: #d97706;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme='dark'] .hud-blitz-btn {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: #f59e0b;
+}
+
+.hud-blitz-btn:hover {
+  background: rgba(245, 158, 11, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Active Blitz HUD */
+.blitz-hud-active {
+  background: rgba(245, 158, 11, 0.08);
+  border-bottom: 2px solid #f59e0b;
+}
+
+[data-theme='dark'] .blitz-hud-active {
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.blitz-badge-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  background: #f59e0b;
+  color: #ffffff;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.blitz-score-pill {
+  font-size: 0.88rem;
+  color: var(--text-main);
+}
+
+.blitz-score-pill strong {
+  font-size: 1.05rem;
+  color: var(--primary-accent);
+}
+
+.blitz-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--tile-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+.blitz-timer-pill.timer-critical {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #dc2626;
+  animation: pulseTimer 0.6s infinite alternate ease-in-out;
+}
+
+[data-theme='dark'] .blitz-timer-pill.timer-critical {
+  background: #450a0a;
+  border-color: #b91c1c;
+  color: #fca5a5;
+}
+
+@keyframes pulseTimer {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+.blitz-exit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--tile-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.blitz-exit-btn:hover {
+  background: var(--tile-hover);
+  color: var(--error-color);
+  border-color: var(--error-color);
+}
+
+.hud-blitz-badge-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #d97706;
+}
+
+[data-theme='dark'] .hud-blitz-badge-hint {
+  color: #fbbf24;
+}
+
+/* --- Blitz Summary Modal --- */
+.blitz-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1000;
+  animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.blitz-modal-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  padding: 2.2rem 1.75rem;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popCard 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popCard {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.blitz-modal-icon {
+  margin-bottom: 0.75rem;
+}
+
+.blitz-modal-card h2 {
+  font-size: 1.6rem;
+  margin-bottom: 0.35rem;
+  color: var(--text-main);
+}
+
+.blitz-modal-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.blitz-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.blitz-highscore-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+
+.blitz-highscore-banner strong {
+  color: #d97706;
+}
+
+[data-theme='dark'] .blitz-highscore-banner strong {
+  color: #fbbf24;
+}
+
+.blitz-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.blitz-restart-btn {
+  background-color: #f59e0b !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  justify-content: center;
+}
+
+.blitz-restart-btn:hover {
+  background-color: #d97706 !important;
+}
+
 
 
