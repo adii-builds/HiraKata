@@ -126,16 +126,10 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [selectedIds]);
 
-  // Sync theme attribute to <html> and update meta tags
+  // Sync theme attribute to <html>
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
     localStorage.setItem(STORAGE_KEY_THEME, theme);
-
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeColorMeta) {
-      themeColorMeta.setAttribute('content', theme === 'dark' ? '#0c0a08' : '#f6f3eb');
-    }
   }, [theme]);
 
   const setAutoAdvance = (val: boolean) => {

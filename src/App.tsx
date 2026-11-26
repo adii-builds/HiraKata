@@ -11,14 +11,6 @@ const MainContent: React.FC = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if ('virtualKeyboard' in navigator) {
-      try {
-        (navigator as any).virtualKeyboard.overlaysContent = false;
-      } catch {
-        // Ignore if read-only or unsupported
-      }
-    }
-
     let baseHeight = Math.max(window.innerHeight, window.visualViewport?.height || 0);
     let lastWidth = window.innerWidth;
 
@@ -50,37 +42,9 @@ const MainContent: React.FC = () => {
 
       if (isKeyboardOpen) {
         document.body.classList.add('keyboard-visible');
-        document.documentElement.style.setProperty('--study-viewport-height', `${currentHeight}px`);
       } else {
-        document.documentElement.style.removeProperty('--study-viewport-height');
-        const isInput =
-          document.activeElement instanceof HTMLInputElement ||
-          document.activeElement instanceof HTMLTextAreaElement;
-        if (!isInput || vkHeight === 0) {
-          document.body.classList.remove('keyboard-visible');
-        }
+        document.body.classList.remove('keyboard-visible');
       }
-    };
-
-    // Pre-emptively tuck dock the instant the input is tapped, BEFORE viewport shrinks
-    const onFocusIn = (e: FocusEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        document.body.classList.add('keyboard-visible');
-        setTimeout(checkKeyboardState, 150);
-        setTimeout(checkKeyboardState, 350);
-      }
-    };
-
-    const onFocusOut = () => {
-      setTimeout(() => {
-        const isInput =
-          document.activeElement instanceof HTMLInputElement ||
-          document.activeElement instanceof HTMLTextAreaElement;
-        if (!isInput) {
-          document.body.classList.remove('keyboard-visible');
-          document.documentElement.style.removeProperty('--study-viewport-height');
-        }
-      }, 60);
     };
 
     const vk = (navigator as any).virtualKeyboard;
@@ -91,8 +55,6 @@ const MainContent: React.FC = () => {
       window.visualViewport.addEventListener('resize', checkKeyboardState);
     }
     window.addEventListener('resize', checkKeyboardState);
-    document.addEventListener('focusin', onFocusIn);
-    document.addEventListener('focusout', onFocusOut);
 
     return () => {
       if (vk) {
@@ -100,8 +62,6 @@ const MainContent: React.FC = () => {
       }
       window.visualViewport?.removeEventListener('resize', checkKeyboardState);
       window.removeEventListener('resize', checkKeyboardState);
-      document.removeEventListener('focusin', onFocusIn);
-      document.removeEventListener('focusout', onFocusOut);
     };
   }, []);
 
