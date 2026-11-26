@@ -35,6 +35,8 @@ interface KanaStoreContextType {
   // Study Options
   autoAdvance: boolean;
   setAutoAdvance: (val: boolean) => void;
+  kanaConversion: boolean;
+  setKanaConversion: (val: boolean) => void;
   fontPreference: FontPreference;
   setFontPreference: (font: FontPreference) => void;
   audioEnabled: boolean;
@@ -53,6 +55,7 @@ interface KanaStoreContextType {
 
 const STORAGE_KEY_SELECTION = 'hirakata_selected_ids_v1';
 const STORAGE_KEY_AUTO_ADVANCE = 'hirakata_auto_advance';
+const STORAGE_KEY_KANA_CONVERSION = 'hirakata_kana_conversion';
 const STORAGE_KEY_FONT = 'hirakata_font_pref';
 const STORAGE_KEY_AUDIO = 'hirakata_audio_enabled';
 const STORAGE_KEY_THEME = 'hirakata_theme';
@@ -83,6 +86,10 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Settings
   const [autoAdvance, setAutoAdvanceState] = useState<boolean>(() => {
     return localStorage.getItem(STORAGE_KEY_AUTO_ADVANCE) !== 'false';
+  });
+
+  const [kanaConversion, setKanaConversionState] = useState<boolean>(() => {
+    return localStorage.getItem(STORAGE_KEY_KANA_CONVERSION) === 'true';
   });
 
   const [fontPreference, setFontPreferenceState] = useState<FontPreference>(() => {
@@ -128,6 +135,11 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setAutoAdvance = (val: boolean) => {
     setAutoAdvanceState(val);
     localStorage.setItem(STORAGE_KEY_AUTO_ADVANCE, String(val));
+  };
+
+  const setKanaConversion = (val: boolean) => {
+    setKanaConversionState(val);
+    localStorage.setItem(STORAGE_KEY_KANA_CONVERSION, String(val));
   };
 
   const setFontPreference = (font: FontPreference) => {
@@ -376,6 +388,8 @@ export const KanaProvider: React.FC<{ children: React.ReactNode }> = ({ children
     counts,
     autoAdvance,
     setAutoAdvance,
+    kanaConversion,
+    setKanaConversion,
     fontPreference,
     setFontPreference,
     audioEnabled,

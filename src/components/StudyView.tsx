@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { KanaItem, hiraganaSingleColumns, katakanaSingleColumns } from '../data/kanaData';
 import { useKanaStore } from '../store/useKanaStore';
 import { playSuccessChime, playMistakeChime, speakKana } from '../utils/sound';
+import { romajiToKana } from '../utils/kanaIme';
 import confetti from 'canvas-confetti';
 import { ContinuousStrokeAnimation } from './ContinuousStrokeAnimation';
 import {
@@ -37,6 +38,8 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     setFontPreference,
     autoAdvance,
     setAutoAdvance,
+    kanaConversion,
+    setKanaConversion,
     toggleColumn,
     recordMistake,
     recordSuccess,
@@ -165,11 +168,19 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!currentCard || feedbackState !== 'idle') return;
 
-    const val = e.target.value.toLowerCase().trim();
-    setInputValue(e.target.value);
+    const rawVal = e.target.value;
+    const nextVal =
+      kanaConversion && currentCard
+        ? romajiToKana(rawVal, currentCard.script, currentCard.char)
+        : rawVal;
+    setInputValue(nextVal);
 
-    // Instant matching
-    const isMatch = currentCard.romajiAnswers.some(ans => ans.toLowerCase() === val);
+    const valTrimmed = nextVal.trim();
+    // Instant matching: match either the converted kana or the romaji variant
+    const isMatch =
+      valTrimmed === currentCard.char ||
+      currentCard.romajiAnswers.some(ans => ans.toLowerCase() === valTrimmed.toLowerCase());
+
     if (isMatch && autoAdvance) {
       handleCorrect();
     }
@@ -211,8 +222,10 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
       e.preventDefault();
       if (!currentCard || inputValue.trim() === '') return;
 
-      const val = inputValue.toLowerCase().trim();
-      const isMatch = currentCard.romajiAnswers.some(ans => ans.toLowerCase() === val);
+      const valTrimmed = inputValue.trim();
+      const isMatch =
+        valTrimmed === currentCard.char ||
+        currentCard.romajiAnswers.some(ans => ans.toLowerCase() === valTrimmed.toLowerCase());
 
       if (isMatch) {
         handleCorrect();
@@ -395,6 +408,15 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
           <button
             type="button"
+            onClick={() => setKanaConversion(!kanaConversion)}
+            className={`hud-mode-toggle-btn ${kanaConversion ? 'active' : ''}`}
+            title={`Input mode: ${kanaConversion ? 'Kana IME Conversion' : 'Direct Rōmaji'}`}
+          >
+            <span>{kanaConversion ? 'かな' : 'ROMAJI'}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowSettingsDrawer(prev => !prev)}
             className="hud-settings-toggle"
             title="Study options"
@@ -413,6 +435,14 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               type="checkbox"
               checked={autoAdvance}
               onChange={e => setAutoAdvance(e.target.checked)}
+            />
+          </div>
+          <div className="option-row">
+            <span>Kana conversion (on-the-fly IME)</span>
+            <input
+              type="checkbox"
+              checked={kanaConversion}
+              onChange={e => setKanaConversion(e.target.checked)}
             />
           </div>
           <div className="option-row">
@@ -503,7 +533,11 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder="Type the rōmaji equivalent..."
+                placeholder={
+                  kanaConversion
+                    ? `Type rōmaji (converts to ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'})...`
+                    : 'Type the rōmaji equivalent...'
+                }
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck={false}
@@ -517,6 +551,14 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         {/* Hints / Instructions */}
         <div className="study-footer-hints">
           <div className="shortcuts-hints-row">
+            {kanaConversion && (
+              <>
+                <span className="hud-ime-badge">
+                  IME: {currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}
+                </span>
+                <span>•</span>
+              </>
+            )}
             <span>
               <kbd className="hint-kbd">Ctrl+Enter</kbd> Audio
             </span>

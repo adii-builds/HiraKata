@@ -524,6 +524,57 @@ html, body {
   transform: translateY(-1px);
 }
 
+.hud-mode-toggle-btn {
+  background: var(--tile-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+
+.hud-mode-toggle-btn:hover {
+  background: var(--tile-hover);
+  color: var(--text-main);
+  border-color: var(--primary-accent);
+}
+
+.hud-mode-toggle-btn.active {
+  background: rgba(39, 68, 113, 0.12);
+  border-color: var(--primary-accent);
+  color: var(--primary-accent);
+}
+
+[data-theme='dark'] .hud-mode-toggle-btn.active {
+  background: rgba(100, 181, 246, 0.18);
+  border-color: #90caf9;
+  color: #90caf9;
+}
+
+.hud-ime-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(39, 68, 113, 0.1);
+  color: var(--primary-accent);
+  border: 1px solid rgba(39, 68, 113, 0.2);
+}
+
+[data-theme='dark'] .hud-ime-badge {
+  background: rgba(100, 181, 246, 0.15);
+  color: #90caf9;
+  border-color: rgba(100, 181, 246, 0.3);
+}
+
 .hud-settings-toggle {
   background: var(--tile-bg);
   border: 1px solid var(--border-color);
