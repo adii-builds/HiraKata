@@ -187,11 +187,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html {
-  color-scheme: dark light;
-  background-color: #0c0a08;
-}
-
 html,
 body {
   height: 100%;
@@ -484,11 +479,12 @@ body {
   }
 }
 
-/* Smart Auto-Tuck: ONLY hidden when keyboard is physically active in viewport */
+/* Smart Auto-Tuck: IMMEDIATELY tuck when keyboard opens so it never flashes or slides across screen */
 body.keyboard-visible .mobile-bottom-dock {
-  transform: translateY(120%);
-  opacity: 0;
-  pointer-events: none;
+  transform: translateY(120%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: none !important;
 }
 
 .dock-content {
