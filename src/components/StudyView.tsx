@@ -5,6 +5,7 @@ import { playSuccessChime, playMistakeChime, speakKana } from '../utils/sound';
 import { romajiToKana } from '../utils/kanaIme';
 import confetti from 'canvas-confetti';
 import { ContinuousStrokeAnimation } from './ContinuousStrokeAnimation';
+import { VirtualKeyboard } from './VirtualKeyboard';
 import {
   Volume2,
   RotateCcw,
@@ -92,6 +93,20 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
   blitzMistakesRef.current = blitzMistakes;
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Mobile viewport detection for dedicated in-page keyboard
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Initialize or restart study session
   const startSession = useCallback(() => {
@@ -385,6 +400,87 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
       }
     }
   };
+
+  // Virtual Keyboard Action Handlers (Static on-screen keyboard for mobile)
+  const handleVirtualChar = useCallback(
+    (char: string) => {
+      if (!currentCard) return;
+
+      // If user is currently viewing the mistake answer, tapping any letter advances
+      if (feedbackState === 'mistake') {
+        advanceAfterMistake();
+        return;
+      }
+
+      if (feedbackState !== 'idle') return;
+
+      const rawVal = inputValue + char;
+      const nextVal =
+        kanaConversion && currentCard
+          ? romajiToKana(rawVal, currentCard.script, currentCard.char)
+          : rawVal;
+      setInputValue(nextVal);
+
+      const valTrimmed = nextVal.trim();
+      const isMatch =
+        valTrimmed === currentCard.char ||
+        currentCard.romajiAnswers.some(ans => ans.toLowerCase() === valTrimmed.toLowerCase());
+
+      if (isMatch && autoAdvance) {
+        handleCorrect();
+      }
+    },
+    [currentCard, feedbackState, inputValue, kanaConversion, autoAdvance, handleCorrect, advanceAfterMistake]
+  );
+
+  const handleVirtualBackspace = useCallback(() => {
+    if (feedbackState === 'mistake') {
+      advanceAfterMistake();
+      return;
+    }
+    if (feedbackState !== 'idle') return;
+    setInputValue(prev => prev.slice(0, -1));
+  }, [feedbackState, advanceAfterMistake]);
+
+  const handleVirtualClear = useCallback(() => {
+    if (feedbackState === 'mistake') {
+      advanceAfterMistake();
+      return;
+    }
+    setInputValue('');
+  }, [feedbackState, advanceAfterMistake]);
+
+  const handleVirtualSubmit = useCallback(() => {
+    if (feedbackState === 'mistake') {
+      advanceAfterMistake();
+      return;
+    }
+
+    if (!currentCard || feedbackState !== 'idle' || inputValue.trim() === '') return;
+
+    const valTrimmed = inputValue.trim();
+    const isMatch =
+      valTrimmed === currentCard.char ||
+      currentCard.romajiAnswers.some(ans => ans.toLowerCase() === valTrimmed.toLowerCase());
+
+    if (isMatch) {
+      handleCorrect();
+    } else {
+      handleMistake();
+    }
+  }, [feedbackState, advanceAfterMistake, currentCard, inputValue, handleCorrect, handleMistake]);
+
+  const handleVirtualSkip = useCallback(() => {
+    if (isBlitzMode) {
+      handleMistake();
+      return;
+    }
+    if (feedbackState === 'idle' && currentCard) {
+      handleMistake();
+    } else if (feedbackState === 'mistake') {
+      advanceAfterMistake();
+    }
+  }, [isBlitzMode, feedbackState, currentCard, handleMistake, advanceAfterMistake]);
 
   // Font class mapping
   const fontClass =
@@ -778,13 +874,26 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 autoCorrect="off"
                 spellCheck={false}
                 autoComplete="off"
+                inputMode={isMobile ? 'none' : 'text'}
                 className="study-hero-input"
               />
             </div>
           )}
         </div>
 
-        {/* Minimal Footer Shortcuts Hint Bar */}
+        {/* In-Page Virtual Keyboard (Permanent & static directly below card on mobile, 0 jumping) */}
+        <VirtualKeyboard
+          onChar={handleVirtualChar}
+          onBackspace={handleVirtualBackspace}
+          onClear={handleVirtualClear}
+          onSubmit={handleVirtualSubmit}
+          onSkip={handleVirtualSkip}
+          feedbackState={feedbackState}
+          isBlitzMode={isBlitzMode}
+          script={currentCard?.script}
+        />
+
+        {/* Minimal Footer Shortcuts Hint Bar (Visible on desktop, hidden on mobile) */}
         <div className="study-shortcuts-footer">
           <div className="shortcuts-row">
             {isBlitzMode && (

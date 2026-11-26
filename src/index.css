@@ -471,6 +471,13 @@ body {
   }
 }
 
+/* Dedicated Study View on Mobile: Dock is hidden to dedicate 100% viewport to Study & on-screen keyboard */
+@media (max-width: 767px) {
+  .mobile-bottom-dock.is-study-mode {
+    display: none !important;
+  }
+}
+
 /* Smart Auto-Tuck: ONLY hidden when keyboard is physically active in viewport */
 body.keyboard-visible .mobile-bottom-dock {
   transform: translateY(120%);
@@ -1532,8 +1539,8 @@ body.keyboard-visible .mobile-bottom-dock {
   .study-arena {
     flex: 1;
     min-height: 0;
-    justify-content: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+    gap: 0.45rem;
   }
 }
 
@@ -1561,13 +1568,13 @@ body.keyboard-visible .mobile-bottom-dock {
   }
 }
 
-/* Dynamic proportional sizing on mobile: adapts to any screen & keyboard */
+/* Dynamic proportional sizing on mobile: balanced with on-screen keyboard */
 @media (max-width: 767px) {
   .study-flashcard-card {
-    flex: 1;
-    min-height: clamp(150px, 22dvh, 195px);
-    max-height: clamp(185px, 32dvh, 270px);
-    padding: 0.85rem 1.15rem;
+    flex: 1 1 auto;
+    min-height: clamp(140px, 18dvh, 180px);
+    max-height: clamp(170px, 26dvh, 230px);
+    padding: 0.75rem 1rem;
     border-radius: 20px;
   }
 }
@@ -2247,3 +2254,163 @@ body.keyboard-visible .mobile-bottom-dock {
   background: var(--bg-surface-hover);
   color: var(--text-main);
 }
+
+/* --------------------------------------------------------------------------
+   11. In-Page Japanese Zen Virtual Keyboard (Mobile Study Mode)
+   -------------------------------------------------------------------------- */
+.study-virtual-keyboard {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  padding-bottom: 2px;
+}
+
+/* Hidden entirely on desktop & laptop screens where physical keyboard is used */
+@media (min-width: 768px) {
+  .study-virtual-keyboard {
+    display: none !important;
+  }
+}
+
+.vk-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.vk-indent-spacer {
+  flex: 0.45;
+  pointer-events: none;
+}
+
+.vk-key {
+  flex: 1;
+  height: clamp(38px, 5.2vh, 46px);
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  background-image: var(--washi-texture);
+  border: 1.5px solid var(--border-medium);
+  border-bottom: 2.5px solid var(--border-strong);
+  border-radius: 9px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 1.12rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.06s ease, background 0.08s ease, border-color 0.08s ease;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vk-key:active {
+  transform: translateY(2px) scale(0.96);
+  border-bottom-width: 1.5px;
+  background: var(--bg-surface-hover);
+}
+
+/* Special Utility Keys (Skip, Clear, Backspace) */
+.vk-key-special {
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  gap: 3px;
+}
+
+.vk-key-skip {
+  flex: 1.45;
+}
+
+.vk-key-backspace {
+  flex: 1.45;
+  color: var(--text-secondary);
+}
+
+.vk-key-clear {
+  flex: 1.35;
+}
+
+/* Space Bar / Mistake Continue Key */
+.vk-key-space {
+  flex: 3.4;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.vk-space-text {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+/* When in mistake state: Space bar transforms into prominent Continue button */
+.vk-continue-active {
+  background: var(--status-danger) !important;
+  border-color: var(--status-danger) !important;
+  border-bottom-color: #7f1d1d !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(185, 28, 28, 0.35);
+  animation: pulseContinue 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes pulseContinue {
+  from { transform: scale(1); }
+  to { transform: scale(1.02); }
+}
+
+.vk-continue-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+/* Submit / Enter Key */
+.vk-key-submit {
+  flex: 1.85;
+  background: var(--hira-primary);
+  border-color: var(--hira-primary);
+  border-bottom-color: var(--hira-primary-hover);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 4px;
+  box-shadow: 0 2px 8px var(--hira-glow);
+}
+
+.script-katakana .vk-key-submit {
+  background: var(--kata-primary);
+  border-color: var(--kata-primary);
+  border-bottom-color: var(--kata-primary-hover);
+  box-shadow: 0 2px 8px var(--kata-glow);
+}
+
+.mode-blitz .vk-key-submit {
+  background: var(--blitz-gold);
+  border-color: var(--blitz-gold);
+  border-bottom-color: #92400e;
+  box-shadow: 0 2px 8px var(--blitz-glow);
+}
+
+.vk-submit-continue {
+  background: var(--status-danger) !important;
+  border-color: var(--status-danger) !important;
+  border-bottom-color: #7f1d1d !important;
+  box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35) !important;
+}
+

@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
       </header>
 
       {/* Mobile Bottom Floating Navigation Dock (Visible on Mobile only) */}
-      <nav className="mobile-bottom-dock" aria-label="Mobile Navigation">
+      <nav className={`mobile-bottom-dock ${currentTab === 'study' ? 'is-study-mode' : ''}`} aria-label="Mobile Navigation">
         <div className="dock-content">
           <button
             type="button"

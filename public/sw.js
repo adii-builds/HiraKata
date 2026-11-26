@@ -1,5 +1,5 @@
 // HiraKata Service Worker - Offline PWA Support
-const CACHE_NAME = 'hirakata-v14';
+const CACHE_NAME = 'hirakata-v15';
 
 const STATIC_PRECACHE = [
   './',
