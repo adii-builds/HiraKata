@@ -3,6 +3,7 @@ import { KanaItem, hiraganaSingleColumns, katakanaSingleColumns } from '../data/
 import { useKanaStore } from '../store/useKanaStore';
 import { playSuccessChime, playMistakeChime, speakKana } from '../utils/sound';
 import confetti from 'canvas-confetti';
+import { StrokeOrderView } from './StrokeOrderView';
 import {
   Volume2,
   RotateCcw,
@@ -12,7 +13,7 @@ import {
   XCircle,
   ArrowRight,
   Sliders,
-
+  PenLine,
 } from 'lucide-react';
 
 interface StudyViewProps {
@@ -56,6 +57,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
   const [bestStreak, setBestStreak] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
+  const [showStrokeOrder, setShowStrokeOrder] = useState<boolean>(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -406,6 +408,25 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             <span className="audio-btn-label">Listen</span>
           </button>
         </div>
+
+        {/* Card Sub-actions: Stroke Order Toggle */}
+        <div className="card-sub-actions">
+          <button
+            type="button"
+            onMouseDown={e => e.preventDefault()}
+            onClick={() => setShowStrokeOrder(prev => !prev)}
+            className={`card-tool-btn ${showStrokeOrder ? 'active' : ''}`}
+            title="Toggle stroke order diagram"
+          >
+            <PenLine size={15} />
+            <span>{showStrokeOrder ? 'Hide Stroke Order' : 'Stroke Order'}</span>
+          </button>
+        </div>
+
+        {/* Stroke Order Diagram (when expanded) */}
+        {showStrokeOrder && currentCard && (
+          <StrokeOrderView char={currentCard.char} />
+        )}
 
         {/* Input & Feedback Area */}
         <div className="study-input-container">
