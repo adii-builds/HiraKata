@@ -44,9 +44,7 @@ const MainContent: React.FC = () => {
 
       if (isKeyboardOpen) {
         document.body.classList.add('keyboard-visible');
-        if (heightDeficit > 150 || vkHeight > 100) {
-          wasFullyOpen = true;
-        }
+        wasFullyOpen = true;
       } else {
         document.body.classList.remove('keyboard-visible');
 

@@ -27,6 +27,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
     hand: { name: 'Klee', style: 'Brush' },
   };
 
+  const handleStudyClick = () => {
+    if (currentTab === 'study') {
+      const input = document.querySelector<HTMLInputElement>('.study-hero-input');
+      if (input) {
+        input.focus();
+      }
+    } else {
+      onSelectTab('study');
+    }
+  };
+
   return (
     <>
       {/* Top Application Header */}
@@ -65,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
 
             <button
               type="button"
-              onClick={() => onSelectTab('study')}
+              onClick={handleStudyClick}
               className={`nav-tab-pill study-pill ${currentTab === 'study' ? 'active-study' : ''} ${
                 counts.total > 0 ? 'pulse-ready' : ''
               }`}
@@ -147,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
 
           <button
             type="button"
-            onClick={() => onSelectTab('study')}
+            onClick={handleStudyClick}
             className={`dock-tab dock-study-btn ${currentTab === 'study' ? 'active-study' : ''} ${
               counts.total > 0 ? 'ready' : ''
             }`}
