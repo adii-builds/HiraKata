@@ -558,7 +558,7 @@ html, body {
 .study-flashcard {
   width: 100%;
   max-width: 320px;
-  aspect-ratio: 1 / 1;
+  min-height: 300px;
   background-color: var(--bg-card);
   border: 2px solid var(--border-color);
   border-radius: 16px;
@@ -569,6 +569,8 @@ html, body {
   justify-content: center;
   position: relative;
   transition: all 0.2s ease;
+  padding: 2.4rem 1rem 1.25rem 1rem;
+  gap: 0.6rem;
 }
 
 .flashcard-badges {
@@ -616,7 +618,7 @@ html, body {
 }
 
 .flashcard-glyph {
-  font-size: 6rem;
+  font-size: 4.75rem;
   line-height: 1;
   color: var(--text-main);
   transition: transform 0.15s ease;
@@ -924,192 +926,61 @@ html, body {
 }
 
 /* ========================================================
-   STROKE ORDER PANEL & KANJIVG STYLES
+   CONTINUOUS STROKE ORDER ANIMATION
    ======================================================== */
-.card-sub-actions {
+.continuous-stroke-wrapper {
   display: flex;
-  justify-content: center;
-  margin-top: 0.75rem;
-  width: 100%;
-}
-
-.card-tool-btn {
-  display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.2rem 0.6rem;
   background: var(--tile-bg);
   border: 1px solid var(--border-color);
-  border-radius: 999px;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.card-tool-btn:hover {
-  background: var(--tile-hover);
-  color: var(--text-main);
-  border-color: var(--primary-accent);
-}
-
-.card-tool-btn.active {
-  background: var(--tile-selected-bg);
-  color: var(--primary-accent);
-  border-color: var(--primary-accent);
-}
-
-.stroke-order-panel {
-  width: 100%;
-  max-width: 320px;
-  margin-top: 0.85rem;
-  background-color: var(--bg-card);
-  border: 1.5px solid var(--border-color);
   border-radius: 12px;
-  padding: 0.85rem 1rem;
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  animation: fadeIn 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.stroke-order-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.45rem;
-}
-
-.stroke-order-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-}
-
-.stroke-anim-toggle-btn {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  background: var(--tile-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-main);
-  cursor: pointer;
-}
-
-.stroke-anim-toggle-btn:hover {
-  background: var(--tile-hover);
-}
-
-.stroke-anim-toggle-btn.active {
-  background: var(--primary-accent);
-  color: #ffffff;
-  border-color: var(--primary-accent);
-}
-
-.stroke-order-grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.25rem 0;
-}
-
-.stroke-char-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.stroke-char-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.stroke-svg-container {
-  width: 110px;
-  height: 110px;
+.continuous-stroke-char {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--tile-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 4px;
 }
 
-.stroke-svg-container svg {
-  width: 100%;
-  height: 100%;
+.continuous-stroke-svg {
+  display: block;
 }
 
-/* Adapting KanjiVG SVG colors to themes */
-.stroke-svg-container svg path {
-  stroke: var(--text-main) !important;
-  stroke-width: 3.5 !important;
+/* Background faint guide showing character shape */
+.stroke-guide-layer path {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 4.5;
   stroke-linecap: round;
   stroke-linejoin: round;
+  opacity: 0.22;
 }
 
-.stroke-svg-container svg text {
-  fill: var(--primary-accent) !important;
-  font-family: var(--font-base) !important;
-  font-weight: 700 !important;
-  font-size: 9px !important;
+/* Active drawn stroke in sequence */
+.stroke-active-layer path {
+  fill: none;
+  stroke: var(--primary-accent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
 }
 
-/* Animated mode: stroke-by-stroke animation */
-.animated-mode .stroke-svg-container svg text {
-  display: none;
+@keyframes continuousDraw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  28%, 80% {
+    stroke-dashoffset: 0;
+  }
+  98%, 100% {
+    stroke-dashoffset: 100;
+  }
 }
 
-.animated-mode .stroke-svg-container svg path {
-  stroke-dasharray: 200;
-  stroke-dashoffset: 200;
-  animation: drawStroke 2s ease-in-out infinite alternate;
-}
-
-.animated-mode .stroke-svg-container svg path:nth-child(1) { animation-delay: 0s; }
-.animated-mode .stroke-svg-container svg path:nth-child(2) { animation-delay: 0.4s; }
-.animated-mode .stroke-svg-container svg path:nth-child(3) { animation-delay: 0.8s; }
-.animated-mode .stroke-svg-container svg path:nth-child(4) { animation-delay: 1.2s; }
-.animated-mode .stroke-svg-container svg path:nth-child(5) { animation-delay: 1.6s; }
-
-@keyframes drawStroke {
-  0% { stroke-dashoffset: 200; }
-  50%, 100% { stroke-dashoffset: 0; }
-}
-
-.stroke-order-legend {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 0.2rem;
-}
-
-.stroke-order-loading,
-.stroke-order-fallback {
-  width: 100%;
-  max-width: 320px;
-  padding: 0.75rem;
-  background: var(--tile-bg);
-  border: 1px dashed var(--border-color);
-  border-radius: 8px;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 0.75rem;
-}
 
