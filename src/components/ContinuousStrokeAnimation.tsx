@@ -15,9 +15,12 @@ interface CharData {
   paths: ParsedPath[];
 }
 
+const STROKE_DATA_CACHE = new Map<string, CharData[]>();
+
 export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps> = ({ char }) => {
-  const [charsData, setCharsData] = useState<CharData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const cached = STROKE_DATA_CACHE.get(char);
+  const [charsData, setCharsData] = useState<CharData[]>(() => cached || []);
+  const [loading, setLoading] = useState<boolean>(() => !cached);
 
   // Active stroke count currently visible/drawn (1-indexed: 0 means blank guide, 1 means stroke 1 drawn, etc.)
   const [activeStrokeStep, setActiveStrokeStep] = useState<number>(0);
@@ -26,8 +29,17 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chars = Array.from(char);
 
-  // 1. Load SVG path data
+  // 1. Load SVG path data with synchronous cache check
   useEffect(() => {
+    const cachedData = STROKE_DATA_CACHE.get(char);
+    if (cachedData) {
+      setCharsData(cachedData);
+      setLoading(false);
+      setActiveStrokeStep(0);
+      setIsResetting(false);
+      return;
+    }
+
     let isCancelled = false;
     setLoading(true);
     setActiveStrokeStep(0);
@@ -63,6 +75,9 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
       }
 
       if (!isCancelled) {
+        if (results.length > 0) {
+          STROKE_DATA_CACHE.set(char, results);
+        }
         setCharsData(results);
         setLoading(false);
       }
@@ -128,7 +143,11 @@ export const ContinuousStrokeAnimation: React.FC<ContinuousStrokeAnimationProps>
   }, [loading, charsData, char]);
 
   if (loading || charsData.length === 0) {
-    return null;
+    return (
+      <div className="continuous-stroke-wrapper" aria-hidden="true">
+        <div className="continuous-stroke-char stroke-placeholder" />
+      </div>
+    );
   }
 
   return (
