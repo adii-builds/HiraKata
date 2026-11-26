@@ -479,12 +479,9 @@ body {
   }
 }
 
-/* Smart Auto-Tuck: IMMEDIATELY tuck when keyboard opens so it never flashes or slides across screen */
+/* Smart Auto-Tuck: Completely hide when keyboard is open so it NEVER jumps into view */
 body.keyboard-visible .mobile-bottom-dock {
-  transform: translateY(120%) !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: none !important;
+  display: none !important;
 }
 
 .dock-content {
@@ -1097,8 +1094,8 @@ body.keyboard-visible .mobile-bottom-dock {
 /* On mobile screens, lock the Study layout so it NEVER scrolls or cuts off */
 @media (max-width: 767px) {
   .study-zen-layout {
-    height: 100dvh;
-    max-height: 100dvh;
+    height: var(--study-viewport-height, 100dvh);
+    max-height: var(--study-viewport-height, 100dvh);
     padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
     overflow: hidden;
     gap: 0.45rem;
@@ -1574,9 +1571,9 @@ body.keyboard-visible .mobile-bottom-dock {
 @media (max-width: 767px) {
   .study-flashcard-card {
     flex: 1;
-    min-height: clamp(150px, 22dvh, 195px);
-    max-height: clamp(185px, 32dvh, 270px);
-    padding: 0.85rem 1.15rem;
+    min-height: clamp(125px, 18dvh, 195px);
+    max-height: clamp(165px, 30dvh, 270px);
+    padding: 0.75rem 1.15rem;
     border-radius: 20px;
   }
 }

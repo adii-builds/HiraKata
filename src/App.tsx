@@ -50,7 +50,9 @@ const MainContent: React.FC = () => {
 
       if (isKeyboardOpen) {
         document.body.classList.add('keyboard-visible');
+        document.documentElement.style.setProperty('--study-viewport-height', `${currentHeight}px`);
       } else {
+        document.documentElement.style.removeProperty('--study-viewport-height');
         const isInput =
           document.activeElement instanceof HTMLInputElement ||
           document.activeElement instanceof HTMLTextAreaElement;
@@ -74,6 +76,7 @@ const MainContent: React.FC = () => {
           document.activeElement instanceof HTMLTextAreaElement;
         if (!isInput) {
           document.body.classList.remove('keyboard-visible');
+          document.documentElement.style.removeProperty('--study-viewport-height');
         }
       }, 60);
     };
