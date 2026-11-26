@@ -557,12 +557,14 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               onClick={() => onGoToTab(currentCard?.script || 'hiragana')}
               className="hud-back-btn"
               title="Return to Kana Decks"
+              aria-label="Return to Kana Decks"
             >
               <ArrowLeft size={14} />
-              <span>Decks</span>
+              <span className="hud-back-btn-text">Decks</span>
             </button>
             <span className="hud-step-tag">
-              Card <strong>{currentIndex + 1}</strong> of {totalCards}
+              <span className="step-tag-desktop">Card <strong>{currentIndex + 1}</strong> of {totalCards}</span>
+              <span className="step-tag-mobile"><strong>{currentIndex + 1}</strong>/{totalCards}</span>
             </span>
             <div className="hud-slim-progress-track">
               <div className="hud-slim-progress-fill" style={{ width: `${progressPercent}%` }} />
@@ -576,7 +578,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             className="hud-standalone-blitz-btn"
             title="Start 60-Second Speed Blitz drill"
           >
-            <Zap size={14} className="text-gold" />
+            <Zap size={13} className="text-gold" />
             <span className="blitz-label-text">Blitz</span>
             <span className="blitz-sub-pill">60s</span>
           </button>
@@ -615,8 +617,10 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               onClick={() => setKanaConversion(!kanaConversion)}
               className={`hud-mode-pill ${kanaConversion ? 'ime-on' : ''}`}
               title={`Switch input mode: ${kanaConversion ? 'Kana IME Conversion' : 'Direct Rōmaji'}`}
+              aria-label={`Switch input mode: ${kanaConversion ? 'Kana IME' : 'Rōmaji'}`}
             >
-              <span>{kanaConversion ? 'かな' : 'ROMAJI'}</span>
+              <span className="ime-tag-desktop">{kanaConversion ? 'かな' : 'ROMAJI'}</span>
+              <span className="ime-tag-mobile">{kanaConversion ? 'かな' : 'RO'}</span>
             </button>
 
             {/* Options Toggle */}
@@ -625,6 +629,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               onClick={() => setShowSettingsDrawer(prev => !prev)}
               className="hud-icon-pill"
               title="Study options"
+              aria-label="Study options"
             >
               <Sliders size={15} />
             </button>

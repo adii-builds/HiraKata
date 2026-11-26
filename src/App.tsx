@@ -21,10 +21,6 @@ const MainContent: React.FC = () => {
         document.body.classList.add('keyboard-visible');
       } else {
         document.body.classList.remove('keyboard-visible');
-        // When user dismissed keyboard via back button/gesture, blur lingering input focus
-        if (document.activeElement instanceof HTMLInputElement) {
-          document.activeElement.blur();
-        }
       }
     };
 

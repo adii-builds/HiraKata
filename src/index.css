@@ -1112,15 +1112,110 @@ body.keyboard-visible .mobile-bottom-dock {
   flex-wrap: wrap;
 }
 
+.step-tag-mobile {
+  display: none;
+}
+
+.step-tag-desktop {
+  display: inline;
+}
+
+.ime-tag-mobile {
+  display: none;
+}
+
+.ime-tag-desktop {
+  display: inline;
+}
+
 @media (max-width: 767px) {
+  .step-tag-mobile {
+    display: inline;
+  }
+
+  .step-tag-desktop {
+    display: none;
+  }
+
+  .ime-tag-mobile {
+    display: inline;
+  }
+
+  .ime-tag-desktop {
+    display: none;
+  }
+
   .study-hud-bar {
-    padding: 0.35rem 0.65rem;
-    gap: 0.4rem;
+    padding: 0.3rem 0.45rem;
+    gap: 0.35rem;
     flex-wrap: nowrap; /* Single un-wrapped line on mobile */
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .hud-progress-section {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    gap: 0.3rem !important;
+  }
+
+  .hud-back-btn {
+    padding: 0.25rem 0.4rem;
+  }
+
+  .hud-back-btn .hud-back-btn-text {
+    display: none;
+  }
+
+  .hud-step-tag {
+    font-size: 0.72rem;
+  }
+
+  .hud-slim-progress-track {
+    display: none !important;
+  }
+
+  .hud-standalone-blitz-btn {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.72rem;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .hud-standalone-blitz-btn .blitz-sub-pill {
+    display: none !important;
+  }
+
+  .hud-controls-section {
+    flex-shrink: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem !important;
   }
 
   .hud-controls-section .weak-spots-pill {
     display: none !important;
+  }
+
+  .hud-controls-section .accuracy-chip {
+    display: none !important;
+  }
+
+  .hud-metric-chip {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.72rem;
+    gap: 0.2rem;
+  }
+
+  .hud-mode-pill {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+
+  .hud-icon-pill {
+    padding: 0.28rem;
+    flex-shrink: 0;
   }
 }
 
