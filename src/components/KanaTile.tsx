@@ -10,7 +10,6 @@ export const KanaTile: React.FC<KanaTileProps> = ({ item }) => {
   const { selectedIds, toggleKana, fontPreference } = useKanaStore();
   const isSelected = selectedIds.has(item.id);
 
-  // Font class mapping
   const fontClass =
     fontPreference === 'mincho'
       ? 'font-mincho'
@@ -22,12 +21,15 @@ export const KanaTile: React.FC<KanaTileProps> = ({ item }) => {
     <button
       type="button"
       onClick={() => toggleKana(item.id)}
-      className={`kana-tile ${isSelected ? 'selected' : ''}`}
+      className={`kana-card-tile ${isSelected ? 'is-selected' : ''} script-${item.script}`}
       aria-pressed={isSelected}
       aria-label={`${item.char} (${item.displayRomaji})`}
     >
-      <span className={`kana-char ${fontClass}`}>{item.char}</span>
-      <span className="kana-romaji">{item.displayRomaji}</span>
+      <div className="tile-inner">
+        <span className={`tile-kana ${fontClass}`}>{item.char}</span>
+        <span className="tile-romaji">{item.displayRomaji}</span>
+      </div>
+      {isSelected && <div className="tile-selection-indicator" />}
     </button>
   );
 };

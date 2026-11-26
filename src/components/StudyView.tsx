@@ -238,7 +238,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
           return prevDeck;
         });
         setCurrentIndex(prev => prev + 1);
-      }, 120);
+      }, 100);
       return;
     }
 
@@ -262,7 +262,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
       } else {
         setCurrentIndex(prev => prev + 1);
       }
-    }, 280);
+    }, 260);
   }, [currentCard, recordSuccess, isBlitzMode, currentIndex, selectedItems, streak, bestStreak, deck.length]);
 
   // Handle Mistake
@@ -275,7 +275,6 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
     if (isBlitzMode) {
       setBlitzMistakes(prev => prev + 1);
-      // In blitz, quickly advance after 300ms so timer isn't blocked
       setTimeout(() => {
         setInputValue('');
         setFeedbackState('idle');
@@ -286,7 +285,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
           return prevDeck;
         });
         setCurrentIndex(prev => prev + 1);
-      }, 300);
+      }, 280);
       return;
     }
 
@@ -333,7 +332,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     }
   };
 
-  // Handle Key Down (Keyboard shortcuts: Ctrl+Enter for audio, Tab to reveal answer/skip)
+  // Handle Key Down
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // 1. Shortcut: Ctrl+Enter or Cmd+Enter -> Play audio pronunciation
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -397,19 +396,19 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
   // --- 1. Empty State (0 characters selected) ---
   if (counts.total === 0) {
     return (
-      <div className="study-empty-state">
-        <div className="empty-card">
-          <div className="empty-icon-circle">
-            <Sparkles size={36} className="text-accent" />
+      <div className="study-empty-layout">
+        <div className="empty-zen-card">
+          <div className="empty-zen-icon">
+            <Sparkles size={32} className="text-accent" />
           </div>
-          <h2>No Characters Selected</h2>
-          <p>
-            Choose which Kana you want to drill by selecting columns or rows in Hiragana and Katakana.
+          <h2 className="empty-zen-title">No Characters Selected</h2>
+          <p className="empty-zen-subtitle">
+            Choose which Kana you want to drill by selecting rows or columns in Hiragana and Katakana.
           </p>
 
-          <div className="quick-presets">
-            <span className="preset-label">Quick Start Options:</span>
-            <div className="preset-buttons">
+          <div className="empty-quick-decks">
+            <span className="quick-decks-label">Recommended Quick Decks:</span>
+            <div className="quick-decks-grid">
               {weakSpotsCount > 0 && (
                 <button
                   type="button"
@@ -417,9 +416,10 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                     drillWeakSpots();
                     startSession();
                   }}
-                  className="preset-btn weak-spots-btn"
+                  className="quick-deck-btn btn-flame"
                 >
-                  🔥 Drill Weak Spots ({weakSpotsCount} characters)
+                  <Flame size={15} />
+                  <span>Drill Weak Spots ({weakSpotsCount})</span>
                 </button>
               )}
               <button
@@ -428,9 +428,9 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                   toggleColumn('hiragana', 'single', 0);
                   startSession();
                 }}
-                className="preset-btn"
+                className="quick-deck-btn"
               >
-                Hiragana First Row (あ, い, う, え, お)
+                <span>Hiragana Vowels (あ, い, う, え, お)</span>
               </button>
               <button
                 type="button"
@@ -438,9 +438,9 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                   hiraganaSingleColumns.slice(0, 5).forEach(c => toggleColumn('hiragana', 'single', c.columnIdx));
                   startSession();
                 }}
-                className="preset-btn"
+                className="quick-deck-btn"
               >
-                Hiragana First 5 Rows (a to na)
+                <span>Hiragana First 5 Rows (a to na)</span>
               </button>
               <button
                 type="button"
@@ -448,19 +448,19 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                   katakanaSingleColumns.slice(0, 5).forEach(c => toggleColumn('katakana', 'single', c.columnIdx));
                   startSession();
                 }}
-                className="preset-btn"
+                className="quick-deck-btn"
               >
-                Katakana First 5 Rows (ア to ナ)
+                <span>Katakana First 5 Rows (ア to ナ)</span>
               </button>
             </div>
           </div>
 
-          <div className="empty-nav-links">
-            <button type="button" onClick={() => onGoToTab('hiragana')} className="empty-link-btn">
-              Go to Hiragana
+          <div className="empty-actions-row">
+            <button type="button" onClick={() => onGoToTab('hiragana')} className="empty-nav-action-btn">
+              Explore Hiragana
             </button>
-            <button type="button" onClick={() => onGoToTab('katakana')} className="empty-link-btn">
-              Go to Katakana
+            <button type="button" onClick={() => onGoToTab('katakana')} className="empty-nav-action-btn">
+              Explore Katakana
             </button>
           </div>
         </div>
@@ -476,34 +476,36 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
         : 100;
 
     return (
-      <div className="study-completed-container">
-        <div className="completed-card">
-          <CheckCircle2 size={54} className="text-success" />
-          <h2>Session Complete!</h2>
-          <p className="completed-subtitle">All selected characters mastered.</p>
+      <div className="study-completed-layout">
+        <div className="completed-zen-card">
+          <div className="completed-zen-icon">
+            <CheckCircle2 size={48} className="text-success" />
+          </div>
+          <h2 className="completed-zen-title">Deck Mastered!</h2>
+          <p className="completed-zen-subtitle">All selected characters reviewed with precision.</p>
 
-          <div className="completed-stats-grid">
-            <div className="stat-box">
-              <span className="stat-val">{correctCount}</span>
-              <span className="stat-lbl">Cards Studied</span>
+          <div className="completed-metrics-grid">
+            <div className="metric-zen-box">
+              <span className="metric-val">{correctCount}</span>
+              <span className="metric-label">Cards Solved</span>
             </div>
-            <div className="stat-box">
-              <span className="stat-val">{accuracy}%</span>
-              <span className="stat-lbl">Accuracy</span>
+            <div className="metric-zen-box">
+              <span className="metric-val">{accuracy}%</span>
+              <span className="metric-label">Accuracy</span>
             </div>
-            <div className="stat-box">
-              <span className="stat-val">{bestStreak} 🔥</span>
-              <span className="stat-lbl">Best Streak</span>
+            <div className="metric-zen-box">
+              <span className="metric-val">{bestStreak} 🔥</span>
+              <span className="metric-label">Best Streak</span>
             </div>
           </div>
 
-          <div className="completed-actions">
-            <button type="button" onClick={startSession} className="primary-action-btn">
+          <div className="completed-actions-row">
+            <button type="button" onClick={startSession} className="primary-zen-btn">
               <RotateCcw size={16} />
-              <span>Study Again</span>
+              <span>Drill Again</span>
             </button>
-            <button type="button" onClick={() => onGoToTab('hiragana')} className="secondary-action-btn">
-              Select Different Kana
+            <button type="button" onClick={() => onGoToTab('hiragana')} className="secondary-zen-btn">
+              Pick New Cards
             </button>
           </div>
         </div>
@@ -511,69 +513,66 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     );
   }
 
-  // Calculate Progress
+  // Progress metrics
   const totalCards = deck.length;
-  const progressPercent = totalCards > 0 ? Math.round(((currentIndex) / totalCards) * 100) : 0;
+  const progressPercent = totalCards > 0 ? Math.round((currentIndex / totalCards) * 100) : 0;
   const accuracy =
     correctCount + mistakeCount > 0
       ? Math.round((correctCount / (correctCount + mistakeCount)) * 100)
       : 100;
 
   return (
-    <div className="study-workspace">
-      {/* Top HUD: Blitz Active vs Normal */}
+    <div className={`study-zen-layout ${isBlitzMode ? 'mode-blitz' : ''}`}>
+      {/* Top Floating HUD Bar */}
       {isBlitzMode ? (
-        <div className="study-hud blitz-hud-active">
-          <div className="hud-left">
-            <span className="blitz-badge-active">
-              <Zap size={14} className="text-blitz" />
-              <span>60s BLITZ</span>
+        <div className="study-hud-bar blitz-active-hud">
+          <div className="hud-pill-group">
+            <span className="blitz-lightning-badge">
+              <Zap size={14} /> 60s BLITZ
             </span>
-            <span className="blitz-score-pill">
+            <span className="blitz-score-chip">
               Score: <strong>{blitzScore}</strong>
             </span>
           </div>
 
-          <div className="hud-right">
-            <div className={`blitz-timer-pill ${blitzTimeLeft <= 10 ? 'timer-critical' : ''}`}>
+          <div className="hud-pill-group">
+            <div className={`blitz-countdown-pill ${blitzTimeLeft <= 10 ? 'is-critical' : ''}`}>
               <Timer size={15} />
               <span>{blitzTimeLeft}s</span>
             </div>
 
-            <button
-              type="button"
-              onClick={exitBlitz}
-              className="blitz-exit-btn"
-              title="Exit Blitz Mode"
-            >
-              <X size={15} />
+            <button type="button" onClick={exitBlitz} className="blitz-quit-pill" title="Exit Blitz Mode">
+              <X size={14} />
               <span>Exit</span>
             </button>
           </div>
         </div>
       ) : (
-        <div className="study-hud">
-          <div className="hud-left">
-            <span className="hud-counter">
+        <div className="study-hud-bar">
+          {/* Progress Section */}
+          <div className="hud-progress-section">
+            <span className="hud-step-tag">
               Card <strong>{currentIndex + 1}</strong> of {totalCards}
             </span>
-            <div className="hud-progress-bar">
-              <div className="hud-progress-fill" style={{ width: `${progressPercent}%` }} />
+            <div className="hud-slim-progress-track">
+              <div className="hud-slim-progress-fill" style={{ width: `${progressPercent}%` }} />
             </div>
           </div>
 
-          <div className="hud-right">
-            {/* 60s Blitz button */}
+          {/* Quick Controls Section */}
+          <div className="hud-controls-section">
+            {/* 60s Blitz Mode Button */}
             <button
               type="button"
               onClick={startBlitz}
-              className="hud-blitz-btn"
-              title="Start 60-Second Speed Blitz mode"
+              className="hud-action-pill blitz-pill"
+              title="Start 60-Second Speed Blitz drill"
             >
-              <Zap size={14} className="text-blitz" />
-              <span>60s Blitz</span>
+              <Zap size={13} className="text-gold" />
+              <span>Blitz (60s)</span>
             </button>
 
+            {/* Weak Spots Button */}
             {weakSpotsCount > 0 && (
               <button
                 type="button"
@@ -581,145 +580,151 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                   drillWeakSpots();
                   startSession();
                 }}
-                className="hud-weak-spots-btn"
+                className="hud-action-pill weak-spots-pill"
                 title="Drill only characters you struggled with"
               >
-                <Flame size={14} className="text-flame" />
+                <Flame size={13} className="text-flame" />
                 <span>Weak Spots ({weakSpotsCount})</span>
               </button>
             )}
 
-            <div className="hud-metric" title="Current streak">
-              <Flame size={16} className={streak > 0 ? 'text-flame' : 'text-muted'} />
+            {/* Streak & Accuracy */}
+            <div className="hud-metric-chip" title="Current streak">
+              <Flame size={14} className={streak > 0 ? 'text-flame' : 'text-subtle'} />
               <span>{streak}</span>
             </div>
 
-            <div className="hud-metric" title="Accuracy">
+            <div className="hud-metric-chip" title="Accuracy">
               <span>{accuracy}%</span>
             </div>
 
+            {/* Input IME Switcher */}
             <button
               type="button"
               onClick={() => setKanaConversion(!kanaConversion)}
-              className={`hud-mode-toggle-btn ${kanaConversion ? 'active' : ''}`}
-              title={`Input mode: ${kanaConversion ? 'Kana IME Conversion' : 'Direct Rōmaji'}`}
+              className={`hud-mode-pill ${kanaConversion ? 'ime-on' : ''}`}
+              title={`Switch input mode: ${kanaConversion ? 'Kana IME Conversion' : 'Direct Rōmaji'}`}
             >
               <span>{kanaConversion ? 'かな' : 'ROMAJI'}</span>
             </button>
 
+            {/* Options Toggle */}
             <button
               type="button"
               onClick={() => setShowSettingsDrawer(prev => !prev)}
-              className="hud-settings-toggle"
+              className="hud-icon-pill"
               title="Study options"
             >
-              <Sliders size={16} />
+              <Sliders size={15} />
             </button>
           </div>
         </div>
       )}
 
-      {/* Settings Drawer (Options) */}
+      {/* Drawer: Settings Panel */}
       {!isBlitzMode && showSettingsDrawer && (
-        <div className="study-options-panel">
-          <div className="option-row">
+        <div className="study-settings-drawer">
+          <div className="drawer-row">
             <span>Auto-advance on match</span>
             <input
               type="checkbox"
               checked={autoAdvance}
               onChange={e => setAutoAdvance(e.target.checked)}
+              className="drawer-toggle"
             />
           </div>
-          <div className="option-row">
+          <div className="drawer-row">
             <span>Kana conversion (on-the-fly IME)</span>
             <input
               type="checkbox"
               checked={kanaConversion}
               onChange={e => setKanaConversion(e.target.checked)}
+              className="drawer-toggle"
             />
           </div>
-          <div className="option-row">
+          <div className="drawer-row">
             <span>Japanese Font</span>
             <select
               value={fontPreference}
               onChange={e => setFontPreference(e.target.value as any)}
-              className="option-select"
+              className="drawer-select"
             >
               <option value="gothic">Gothic (Standard Sans)</option>
-              <option value="mincho">Mincho (Serif)</option>
+              <option value="mincho">Mincho (Traditional Serif)</option>
               <option value="hand">Klee (Handwritten Brush)</option>
             </select>
           </div>
         </div>
       )}
 
-      {/* Main Flashcard Card */}
-      <div className="study-center-stage">
+      {/* Central Flashcard Arena */}
+      <div className="study-arena">
         <div
-          className={`study-flashcard ${
-            feedbackState === 'correct' ? 'card-correct' : feedbackState === 'mistake' ? 'card-mistake' : ''
-          }`}
+          className={`study-flashcard-card ${
+            feedbackState === 'correct' ? 'card-pass' : feedbackState === 'mistake' ? 'card-fail' : ''
+          } script-${currentCard?.script}`}
         >
-          {/* Script Badges */}
-          <div className="flashcard-badges">
-            <span className={`badge-script ${currentCard?.script}`}>
+          {/* Card Meta Header */}
+          <div className="card-meta-tags">
+            <span className={`tag-script script-${currentCard?.script}`}>
               {currentCard?.script.toUpperCase()}
             </span>
-            <span className="badge-category">{currentCard?.category.toUpperCase()}</span>
+            <span className="tag-category">{currentCard?.category.toUpperCase()}</span>
           </div>
 
-          {/* Big Kana Glyph */}
-          <div className={`flashcard-glyph ${fontClass}`}>
+          {/* Main Kana Glyph */}
+          <div className={`card-glyph-hero ${fontClass}`}>
             {currentCard?.char}
           </div>
 
-          {/* Continuous Stroke Order Animation directly below the character */}
-          {currentCard && <ContinuousStrokeAnimation char={currentCard.char} />}
+          {/* Calligraphic Stroke Order Animation directly under character */}
+          {currentCard && (
+            <div className="card-stroke-display">
+              <ContinuousStrokeAnimation char={currentCard.char} />
+            </div>
+          )}
 
-          {/* Dedicated Audio Play Button (plays only when pressed) */}
+          {/* Dedicated Audio Listen Button */}
           <button
             type="button"
             onMouseDown={e => e.preventDefault()}
             onClick={() => currentCard && speakKana(currentCard.char)}
-            className="glyph-audio-btn"
-            title="Play pronunciation"
-            aria-label="Play pronunciation"
+            className="card-audio-pill"
+            title="Listen to Japanese pronunciation (Ctrl+Enter)"
+            aria-label="Listen to Japanese pronunciation"
           >
-            <Volume2 size={18} />
-            <span className="audio-btn-label">Listen</span>
+            <Volume2 size={16} />
+            <span className="audio-label">Listen</span>
           </button>
         </div>
 
-        {/* Input & Feedback Area */}
-        <div className="study-input-container">
+        {/* Dynamic Response Field Dock */}
+        <div className="study-response-dock">
           {feedbackState === 'mistake' && !isBlitzMode ? (
-            <div className="mistake-feedback-box">
-              <div className="mistake-text">
-                <XCircle size={20} className="text-danger" />
-                <div>
-                  <div>
-                    Correct answer:{' '}
-                    <strong>{currentCard?.char} = {mistakeAnswer}</strong>
+            <div className="mistake-alert-pill">
+              <div className="mistake-info">
+                <XCircle size={18} className="text-danger" />
+                <div className="mistake-text-group">
+                  <div className="mistake-main-ans">
+                    Answer: <strong>{currentCard?.char} = {mistakeAnswer}</strong>
                     {currentCard?.romajiAnswers.length && currentCard.romajiAnswers.length > 1
-                      ? ` (or ${currentCard.romajiAnswers.filter(a => a !== mistakeAnswer).join(', ')})`
+                      ? ` (${currentCard.romajiAnswers.filter(a => a !== mistakeAnswer).join(', ')})`
                       : ''}
                   </div>
-                  <div className="mistake-sub-note">
-                    Logged to Weak Spots • Press Tab or Enter to continue
-                  </div>
+                  <span className="mistake-tip">Logged to Weak Spots • Tab or Enter to continue</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={advanceAfterMistake}
-                className="mistake-continue-btn"
+                className="mistake-skip-pill"
               >
                 <span>Continue</span>
-                <ArrowRight size={16} />
+                <ArrowRight size={14} />
               </button>
             </div>
           ) : (
-            <div className="input-field-wrapper">
+            <div className="input-pill-wrapper">
               <input
                 ref={inputRef}
                 type="text"
@@ -732,114 +737,116 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
                 placeholder={
                   isBlitzMode
                     ? kanaConversion
-                      ? `⚡ Blitz! Type in ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}...`
-                      : '⚡ Blitz! Quick rōmaji...'
+                      ? `⚡ Type in ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}...`
+                      : '⚡ Quick rōmaji...'
                     : kanaConversion
-                    ? `Type rōmaji (converts to ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'})...`
+                    ? `Type in rōmaji (converts to ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'})...`
                     : 'Type the rōmaji equivalent...'
                 }
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck={false}
                 autoComplete="off"
-                className="study-text-input"
+                className="study-hero-input"
               />
             </div>
           )}
         </div>
 
-        {/* Hints / Instructions */}
-        <div className="study-footer-hints">
-          <div className="shortcuts-hints-row">
+        {/* Minimal Footer Shortcuts Hint Bar */}
+        <div className="study-shortcuts-footer">
+          <div className="shortcuts-row">
             {isBlitzMode && (
               <>
-                <span className="hud-blitz-badge-hint">
-                  <Zap size={13} className="text-blitz" /> 60s Blitz Mode
+                <span className="shortcut-tag blitz-tag">
+                  <Zap size={12} /> Blitz Active
                 </span>
-                <span>•</span>
+                <span className="dot-sep">•</span>
               </>
             )}
             {kanaConversion && (
               <>
-                <span className="hud-ime-badge">
+                <span className="shortcut-tag ime-tag">
                   IME: {currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}
                 </span>
-                <span>•</span>
+                <span className="dot-sep">•</span>
               </>
             )}
-            <span>
-              <kbd className="hint-kbd">Ctrl+Enter</kbd> Audio
+            <span className="shortcut-item">
+              <kbd className="zen-kbd">Ctrl+Enter</kbd> Audio
             </span>
-            <span>•</span>
-            <span>
-              <kbd className="hint-kbd">Tab</kbd> {isBlitzMode ? 'Skip' : 'Reveal Answer'}
+            <span className="dot-sep">•</span>
+            <span className="shortcut-item">
+              <kbd className="zen-kbd">Tab</kbd> {isBlitzMode ? 'Skip' : 'Reveal'}
             </span>
-            <span>•</span>
-            <span>
-              {autoAdvance ? 'Auto-advances on match' : 'Press Enter to submit'}
+            <span className="dot-sep">•</span>
+            <span className="shortcut-item">
+              {autoAdvance ? 'Auto-advances' : 'Enter to Submit'}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Blitz Summary Modal */}
+      {/* 60s Blitz Results Modal */}
       {showBlitzSummary && (
-        <div className="blitz-modal-overlay">
-          <div className="blitz-modal-card">
-            <div className="blitz-modal-icon">
+        <div className="zen-modal-backdrop">
+          <div className="zen-modal-sheet">
+            <div className="zen-modal-badge-icon">
               {isNewHighScore ? (
-                <Trophy size={48} className="text-trophy" />
+                <Trophy size={42} className="text-gold" />
               ) : (
-                <Zap size={48} className="text-blitz" />
+                <Zap size={42} className="text-gold" />
               )}
             </div>
 
-            <h2>{isNewHighScore ? '🎉 New High Score!' : '⚡ 60s Blitz Complete!'}</h2>
-            <p className="blitz-modal-subtitle">
+            <h2 className="zen-modal-title">
+              {isNewHighScore ? '🎉 New Personal Record!' : '⚡ 60s Blitz Finished!'}
+            </h2>
+            <p className="zen-modal-desc">
               {isNewHighScore
-                ? `Incredible speed! You set a new personal record with ${blitzScore} kana!`
-                : 'Great speed drilling session! Keep up the momentum.'}
+                ? `Incredible recall speed! You set a new all-time high with ${blitzScore} kana in 60s!`
+                : 'Great speed drilling session! Keep the momentum going.'}
             </p>
 
-            <div className="blitz-stats-grid">
-              <div className="stat-box">
-                <span className="stat-val">{blitzScore}</span>
-                <span className="stat-lbl">Kana Solved</span>
+            <div className="zen-metrics-row">
+              <div className="zen-stat-box">
+                <span className="stat-number">{blitzScore}</span>
+                <span className="stat-caption">Solved</span>
               </div>
-              <div className="stat-box">
-                <span className="stat-val">{blitzScore}</span>
-                <span className="stat-lbl">KPM (Speed)</span>
+              <div className="zen-stat-box">
+                <span className="stat-number">{blitzScore}</span>
+                <span className="stat-caption">KPM (Speed)</span>
               </div>
-              <div className="stat-box">
-                <span className="stat-val">
+              <div className="zen-stat-box">
+                <span className="stat-number">
                   {blitzScore + blitzMistakes > 0
                     ? Math.round((blitzScore / (blitzScore + blitzMistakes)) * 100)
                     : 100}%
                 </span>
-                <span className="stat-lbl">Accuracy</span>
+                <span className="stat-caption">Accuracy</span>
               </div>
             </div>
 
-            <div className="blitz-highscore-banner">
-              <Trophy size={16} className="text-trophy" />
-              <span>Personal Best: <strong>{blitzHighScore}</strong> kana / min</span>
+            <div className="zen-record-banner">
+              <Trophy size={15} className="text-gold" />
+              <span>All-Time Record: <strong>{blitzHighScore}</strong> kana / min</span>
             </div>
 
-            <div className="blitz-modal-actions">
+            <div className="zen-modal-buttons">
               <button
                 type="button"
                 onClick={startBlitz}
-                className="primary-action-btn blitz-restart-btn"
+                className="zen-primary-action-btn"
               >
-                <Zap size={16} />
+                <Zap size={15} />
                 <span>Play Again</span>
               </button>
               <button
                 type="button"
                 onClick={exitBlitz}
-                className="secondary-action-btn"
+                className="zen-secondary-action-btn"
               >
-                Back to Normal Drill
+                Return to Normal Drill
               </button>
             </div>
           </div>

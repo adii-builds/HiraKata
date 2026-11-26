@@ -11,22 +11,24 @@ export const KanaColumnView: React.FC<KanaColumnViewProps> = ({ column }) => {
   const { toggleColumn, isColumnSelected } = useKanaStore();
   const colStatus = isColumnSelected(column.script, column.category, column.columnIdx);
 
-  const headerStatusClass =
-    colStatus === 'all' ? 'header-all' : colStatus === 'some' ? 'header-some' : '';
+  const statusClass =
+    colStatus === 'all' ? 'col-all-selected' : colStatus === 'some' ? 'col-some-selected' : 'col-none-selected';
 
   return (
-    <div className="kana-column">
+    <div className={`kana-column-deck script-${column.script}`}>
+      {/* Column Toggle Header */}
       <button
         type="button"
         onClick={() => toggleColumn(column.script, column.category, column.columnIdx)}
-        className={`column-header-btn ${headerStatusClass}`}
+        className={`column-deck-header ${statusClass}`}
         title={`Toggle column ${column.headerLabel}`}
         aria-label={`Toggle column ${column.headerLabel}`}
       >
-        <span className="column-label">{column.headerLabel}</span>
+        <span className="deck-header-label">{column.headerLabel}</span>
       </button>
 
-      <div className="column-items">
+      {/* Tiles in Column */}
+      <div className="column-deck-tiles">
         {column.items.map(item => (
           <KanaTile key={item.id} item={item} />
         ))}

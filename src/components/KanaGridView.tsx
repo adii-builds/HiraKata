@@ -10,7 +10,7 @@ import {
 } from '../data/kanaData';
 import { useKanaStore } from '../store/useKanaStore';
 import { KanaColumnView } from './KanaColumnView';
-import { CheckSquare, Square, MinusSquare } from 'lucide-react';
+import { CheckCheck, Sparkles } from 'lucide-react';
 
 interface KanaGridViewProps {
   script: ScriptType;
@@ -20,19 +20,18 @@ export const KanaGridView: React.FC<KanaGridViewProps> = ({ script }) => {
   const [activeCategory, setActiveCategory] = useState<CategoryType>('single');
   const { toggleCategory, isCategorySelected, toggleScript, isScriptSelected, counts } = useKanaStore();
 
-  const categories: { key: CategoryType; label: string; shortLabel: string }[] =
+  const categories: { key: CategoryType; label: string; count: number }[] =
     script === 'hiragana'
       ? [
-          { key: 'single', label: 'Single Characters', shortLabel: 'Single' },
-          { key: 'double', label: 'Double Characters', shortLabel: 'Double' },
+          { key: 'single', label: 'Basic (Gojūon)', count: 71 },
+          { key: 'double', label: 'Combos (Yōon)', count: 36 },
         ]
       : [
-          { key: 'single', label: 'Single Characters', shortLabel: 'Single' },
-          { key: 'double', label: 'Double Characters', shortLabel: 'Double' },
-          { key: 'extended', label: 'Extended Characters', shortLabel: 'Extended' },
+          { key: 'single', label: 'Basic (Gojūon)', count: 71 },
+          { key: 'double', label: 'Combos (Yōon)', count: 36 },
+          { key: 'extended', label: 'Extended Loanwords', count: 30 },
         ];
 
-  // Active columns
   const activeColumns =
     script === 'hiragana'
       ? activeCategory === 'single'
@@ -46,69 +45,67 @@ export const KanaGridView: React.FC<KanaGridViewProps> = ({ script }) => {
 
   const catStatus = isCategorySelected(script, activeCategory);
   const scriptStatus = isScriptSelected(script);
-
   const scriptCount = script === 'hiragana' ? counts.hiragana : counts.katakana;
+  const scriptTotal = script === 'hiragana' ? 107 : 137;
 
   return (
-    <div className="kana-view-container">
-      {/* Sub-navigation tabs */}
-      <div className="subnav-bar">
-        <div className="subnav-tabs">
+    <div className={`kana-grid-layout script-${script}`}>
+      {/* Top Banner Toolbar */}
+      <div className="kana-grid-header">
+        <div className="header-meta">
+          <div className="meta-left">
+            <h1 className="script-title">
+              {script === 'hiragana' ? 'Hiragana' : 'Katakana'}
+              <span className="script-kanji">{script === 'hiragana' ? '平仮名' : '片仮名'}</span>
+            </h1>
+            <span className="script-count-chip">
+              <strong>{scriptCount}</strong> / {scriptTotal} selected
+            </span>
+          </div>
+
+          {/* Quick Selection Actions */}
+          <div className="meta-actions">
+            <button
+              type="button"
+              onClick={() => toggleCategory(script, activeCategory)}
+              className={`pill-action-btn ${catStatus === 'all' ? 'pill-active' : ''}`}
+            >
+              <CheckCheck size={14} />
+              <span>{catStatus === 'all' ? 'Deselect Tab' : 'Select Tab'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => toggleScript(script)}
+              className={`pill-action-btn ${scriptStatus === 'all' ? 'pill-active' : ''}`}
+            >
+              <Sparkles size={14} />
+              <span>{scriptStatus === 'all' ? 'Clear Script' : 'Select All'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Category Segmented Filter Tabs */}
+        <div className="category-segmented-bar">
           {categories.map(cat => (
             <button
               key={cat.key}
               type="button"
               onClick={() => setActiveCategory(cat.key)}
-              className={`subnav-tab ${activeCategory === cat.key ? 'active' : ''}`}
+              className={`category-pill-tab ${activeCategory === cat.key ? 'is-active' : ''}`}
             >
-              <span className="tab-label-full">{cat.label}</span>
-              <span className="tab-label-short">{cat.shortLabel}</span>
+              <span>{cat.label}</span>
+              <span className="cat-count-bubble">{cat.count}</span>
             </button>
           ))}
         </div>
-
-        {/* Action buttons: Toggle Category & Toggle Script */}
-        <div className="subnav-actions">
-          <button
-            type="button"
-            onClick={() => toggleCategory(script, activeCategory)}
-            className="action-pill-btn"
-            title={`Toggle all in ${categories.find(c => c.key === activeCategory)?.label}`}
-          >
-            {catStatus === 'all' ? (
-              <CheckSquare size={16} className="text-accent" />
-            ) : catStatus === 'some' ? (
-              <MinusSquare size={16} className="text-accent" />
-            ) : (
-              <Square size={16} />
-            )}
-            <span>This Tab</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => toggleScript(script)}
-            className="action-pill-btn"
-            title={`Toggle all ${script}`}
-          >
-            {scriptStatus === 'all' ? (
-              <CheckSquare size={16} className="text-accent" />
-            ) : scriptStatus === 'some' ? (
-              <MinusSquare size={16} className="text-accent" />
-            ) : (
-              <Square size={16} />
-            )}
-            <span className="btn-label-full">All {script === 'hiragana' ? 'Hiragana' : 'Katakana'} ({scriptCount})</span>
-            <span className="btn-label-short">All ({scriptCount})</span>
-          </button>
-        </div>
       </div>
 
-      {/* Grid Table */}
-      <div className="kana-grid-scroll-wrapper">
-        <div className="kana-grid-columns">
-          {activeColumns.map(column => (
-            <KanaColumnView key={`${column.script}-${column.category}-${column.columnIdx}`} column={column} />
+      {/* Kana Columns Decks Matrix */}
+      <div className="kana-decks-viewport">
+        <div className="kana-decks-container">
+          {activeColumns.map(col => (
+            <KanaColumnView key={`${col.script}-${col.category}-${col.columnIdx}`} column={col} />
           ))}
         </div>
       </div>
