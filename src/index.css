@@ -967,20 +967,7 @@ html, body {
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
 }
 
-@keyframes continuousDraw {
-  0% {
-    stroke-dashoffset: 100;
-  }
-  28%, 80% {
-    stroke-dashoffset: 0;
-  }
-  98%, 100% {
-    stroke-dashoffset: 100;
-  }
-}
 
 
