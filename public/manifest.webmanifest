@@ -1,0 +1,24 @@
+{
+  "name": "HiraKata - Japanese Kana Drill & Stroke Order",
+  "short_name": "HiraKata",
+  "description": "Master Hiragana and Katakana with continuous stroke animations, audio pronunciation, on-the-fly IME, and 60-second speed blitz drills.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0efed",
+  "theme_color": "#274471",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
