@@ -13,7 +13,7 @@ const MainContent: React.FC = () => {
 
     if ('virtualKeyboard' in navigator) {
       try {
-        (navigator as any).virtualKeyboard.overlaysContent = true;
+        (navigator as any).virtualKeyboard.overlaysContent = false;
       } catch {
         // Ignore if read-only or unsupported
       }
@@ -66,6 +66,8 @@ const MainContent: React.FC = () => {
     const onFocusIn = (e: FocusEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         document.body.classList.add('keyboard-visible');
+        setTimeout(checkKeyboardState, 150);
+        setTimeout(checkKeyboardState, 350);
       }
     };
 
