@@ -664,6 +664,33 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
               <option value="hand">Klee (Handwritten Brush)</option>
             </select>
           </div>
+          <div className="drawer-actions-grid">
+            <button
+              type="button"
+              onClick={() => {
+                setShowSettingsDrawer(false);
+                startBlitz();
+              }}
+              className="drawer-action-btn blitz-btn"
+            >
+              <Zap size={14} className="text-gold" />
+              <span>Start 60s Blitz Drill</span>
+            </button>
+            {weakSpotsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSettingsDrawer(false);
+                  drillWeakSpots();
+                  startSession();
+                }}
+                className="drawer-action-btn weak-btn"
+              >
+                <Flame size={14} className="text-flame" />
+                <span>Drill Weak Spots ({weakSpotsCount})</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 

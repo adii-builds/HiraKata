@@ -154,7 +154,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
           >
             <div className="dock-study-pill">
               <Sparkles size={18} />
-              <span className="dock-study-label">Drill</span>
+              <span className="dock-study-label">Study</span>
               <span className="dock-study-counter">{counts.total}</span>
             </div>
           </button>

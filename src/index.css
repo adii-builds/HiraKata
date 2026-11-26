@@ -1,80 +1,83 @@
 /* ==========================================================================
-   HIRAKATA — Modern Traditional Japanese Washi & Ink Design System
-   Rich Color Contrast & Rock-Solid Mobile Keyboard Ergonomics
+   HIRAKATA — Antique Japanese Washi & Sumi-e Ink Design System
+   Medieval Parchment Texture, Refined Mobile Squircles & Dynamic Study Card
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Design Tokens & Color Palettes
+   1. Design Tokens, Parchment Textures & Color Palettes
    -------------------------------------------------------------------------- */
 :root,
 [data-theme='cool'] {
-  /* Canvas & Tiered Surfaces */
-  --bg-app: #f1f4f9;               /* Warm tinted paper grey for true depth */
-  --bg-surface: #ffffff;           /* Elevated crisp white card */
+  /* Washi Paper Noise Texture (Embedded lightweight SVG filter) */
+  --washi-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
+  /* Canvas & Tiered Medieval Washi Surfaces */
+  --bg-app: #f6f3eb;               /* Antique handmade mulberry washi parchment */
+  --bg-surface: #fffdfa;           /* Clean elevated unbleached paper card */
   --bg-surface-elevated: #ffffff;
-  --bg-surface-subtle: #f8fafc;
-  --bg-surface-hover: #e2e8f0;
-  --bg-dock: rgba(255, 255, 255, 0.94);
-  --bg-header: #0f172a;            /* Deep Sumi Navy top anchor */
-  --header-text: #ffffff;
+  --bg-surface-subtle: #eee7d8;     /* Aged paper tint */
+  --bg-surface-hover: #e6ddcb;
+  --bg-dock: rgba(253, 251, 247, 0.94);
+  --bg-header: #14110e;            /* Antique Lacquered Wood Header */
+  --header-text: #f7f3eb;
 
-  /* Borders & Dividers */
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-strong: #94a3b8;
+  /* Borders (Bamboo & Aged Gold Tones) */
+  --border-subtle: #e6ddcd;
+  --border-medium: #d4c5af;
+  --border-strong: #b8a487;
 
-  /* Typography / Sumi-Ink */
-  --text-main: #0f172a;            /* Deep obsidian / sumi ink */
-  --text-secondary: #334155;       /* Slate dark */
-  --text-muted: #64748b;           /* Slate medium */
-  --text-subtle: #94a3b8;
+  /* Typography / Fresh Sumi Ink (墨) */
+  --text-main: #181512;            /* Deep obsidian calligraphic sumi ink */
+  --text-secondary: #3d352b;       /* Charcoal slate */
+  --text-muted: #6e6456;           /* Aged parchment slate */
+  --text-subtle: #9c8e79;
 
-  /* Hiragana (Rindō Indigo System) */
-  --hira-primary: #4338ca;
-  --hira-primary-hover: #3730a3;
-  --hira-banner-bg: #eef2ff;
-  --hira-banner-border: #c7d2fe;
-  --hira-soft-bg: #e0e7ff;
-  --hira-soft-border: #a5b4fc;
-  --hira-text: #3730a3;
-  --hira-gradient: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-  --hira-glow: rgba(79, 70, 229, 0.35);
+  /* Hiragana (Aizome Royal Indigo - 藍染) */
+  --hira-primary: #3730a3;
+  --hira-primary-hover: #2e2685;
+  --hira-banner-bg: #eceffd;
+  --hira-banner-border: #c4ccf7;
+  --hira-soft-bg: #dfe4fa;
+  --hira-soft-border: #9ea9f0;
+  --hira-text: #282375;
+  --hira-gradient: linear-gradient(135deg, #4338ca 0%, #282375 100%);
+  --hira-glow: rgba(55, 48, 163, 0.35);
 
-  /* Katakana (Akane Sunset Vermilion System) */
-  --kata-primary: #ea580c;
-  --kata-primary-hover: #c2410c;
-  --kata-banner-bg: #fff7ed;
-  --kata-banner-border: #fed7aa;
-  --kata-soft-bg: #ffedd5;
-  --kata-soft-border: #fdba74;
-  --kata-text: #9a3412;
-  --kata-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  --kata-glow: rgba(234, 88, 12, 0.35);
+  /* Katakana (Shu-iro Cinnabar Vermilion - 朱色) */
+  --kata-primary: #c2410c;
+  --kata-primary-hover: #9a3412;
+  --kata-banner-bg: #fdf2e8;
+  --kata-banner-border: #fbd6b8;
+  --kata-soft-bg: #fae4cf;
+  --kata-soft-border: #f7b784;
+  --kata-text: #832707;
+  --kata-gradient: linear-gradient(135deg, #ea580c 0%, #9a3412 100%);
+  --kata-glow: rgba(194, 65, 12, 0.35);
 
-  /* Speed Blitz & Weak Spots */
-  --blitz-gold: #d97706;
-  --blitz-gold-bright: #f59e0b;
+  /* Speed Blitz (Kin-paku Gold Leaf - 金箔) & Weak Spots (Hanko Red - 印鑑) */
+  --blitz-gold: #b45309;
+  --blitz-gold-bright: #d97706;
   --blitz-soft-bg: #fef3c7;
   --blitz-soft-border: #fde68a;
-  --blitz-glow: rgba(245, 158, 11, 0.35);
-  --flame-accent: #e11d48;
+  --blitz-glow: rgba(217, 119, 6, 0.35);
+  --flame-accent: #be123c;
   --flame-soft-bg: #ffe4e6;
   --flame-soft-border: #fecdd3;
 
   /* Status */
-  --status-success: #059669;
+  --status-success: #047857;
   --status-success-bg: #d1fae5;
   --status-success-border: #a7f3d0;
-  --status-danger: #dc2626;
+  --status-danger: #b91c1c;
   --status-danger-bg: #fee2e2;
   --status-danger-border: #fca5a5;
 
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-sm: 0 2px 5px rgba(15, 23, 42, 0.08);
-  --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
-  --shadow-elevated: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.05);
-  --shadow-modal: 0 24px 50px -12px rgba(15, 23, 42, 0.3);
+  /* Washi Shadows */
+  --shadow-xs: 0 1px 2px rgba(24, 21, 18, 0.05);
+  --shadow-sm: 0 2px 5px rgba(24, 21, 18, 0.08);
+  --shadow-card: 0 4px 16px -2px rgba(24, 21, 18, 0.08), 0 1px 3px rgba(24, 21, 18, 0.04);
+  --shadow-elevated: 0 12px 28px -4px rgba(24, 21, 18, 0.12), 0 2px 6px rgba(24, 21, 18, 0.05);
+  --shadow-modal: 0 24px 50px -12px rgba(24, 21, 18, 0.35);
 
   /* Fonts */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -84,77 +87,80 @@
 }
 
 [data-theme='dark'] {
-  /* Canvas & Tiered Surfaces */
-  --bg-app: #080c14;               /* Deep nocturnal obsidian */
-  --bg-surface: #111827;           /* Slate surface */
-  --bg-surface-elevated: #1a2436;
-  --bg-surface-subtle: #0d1422;
-  --bg-surface-hover: #1e2c44;
-  --bg-dock: rgba(17, 24, 39, 0.94);
-  --bg-header: #05080e;
-  --header-text: #f8fafc;
+  /* Washi Noise Texture for Dark (Gold-dust & Lacquered grain) */
+  --washi-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 
-  /* Borders & Dividers */
-  --border-subtle: #1e293b;
-  --border-medium: #334155;
-  --border-strong: #475569;
+  /* Nocturnal Urushi Lacquer & Gold Dust (漆 & 蒔絵) */
+  --bg-app: #0c0a08;               /* Deepest Japanese black lacquer */
+  --bg-surface: #15120e;           /* Lacquer surface */
+  --bg-surface-elevated: #1e1a14;
+  --bg-surface-subtle: #1a1612;
+  --bg-surface-hover: #26201a;
+  --bg-dock: rgba(21, 18, 14, 0.94);
+  --bg-header: #070605;
+  --header-text: #f7f3eb;
+
+  /* Borders (Lacquer Edges & Dark Wood) */
+  --border-subtle: #29221b;
+  --border-medium: #3d3328;
+  --border-strong: #574839;
 
   /* Typography */
-  --text-main: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-subtle: #475569;
+  --text-main: #f7f3eb;            /* Rice paper white */
+  --text-secondary: #d6cbbe;       /* Pale parchment */
+  --text-muted: #9c8e79;
+  --text-subtle: #574839;
 
-  /* Hiragana (Rindō Indigo in Dark Mode) */
+  /* Hiragana (Moonlit Indigo) */
   --hira-primary: #818cf8;
   --hira-primary-hover: #a5b4fc;
-  --hira-banner-bg: rgba(79, 70, 229, 0.15);
-  --hira-banner-border: rgba(129, 140, 248, 0.3);
-  --hira-soft-bg: rgba(79, 70, 229, 0.22);
-  --hira-soft-border: rgba(129, 140, 248, 0.4);
+  --hira-banner-bg: rgba(67, 56, 202, 0.16);
+  --hira-banner-border: rgba(129, 140, 248, 0.35);
+  --hira-soft-bg: rgba(67, 56, 202, 0.25);
+  --hira-soft-border: rgba(129, 140, 248, 0.45);
   --hira-text: #c7d2fe;
-  --hira-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-  --hira-glow: rgba(129, 140, 248, 0.4);
+  --hira-gradient: linear-gradient(135deg, #6366f1 0%, #3730a3 100%);
+  --hira-glow: rgba(129, 140, 248, 0.45);
 
-  /* Katakana (Akane Sunset Vermilion in Dark Mode) */
+  /* Katakana (Lantern Vermilion) */
   --kata-primary: #fb923c;
   --kata-primary-hover: #fdba74;
-  --kata-banner-bg: rgba(234, 88, 12, 0.15);
-  --kata-banner-border: rgba(251, 146, 60, 0.3);
-  --kata-soft-bg: rgba(234, 88, 12, 0.22);
-  --kata-soft-border: rgba(251, 146, 60, 0.4);
+  --kata-banner-bg: rgba(194, 65, 12, 0.16);
+  --kata-banner-border: rgba(251, 146, 60, 0.35);
+  --kata-soft-bg: rgba(194, 65, 12, 0.25);
+  --kata-soft-border: rgba(251, 146, 60, 0.45);
   --kata-text: #fed7aa;
-  --kata-gradient: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
-  --kata-glow: rgba(251, 146, 60, 0.4);
+  --kata-gradient: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
+  --kata-glow: rgba(251, 146, 60, 0.45);
 
-  /* Speed Blitz & Weak Spots */
+  /* Speed Blitz (Lantern Gold) */
   --blitz-gold: #fbbf24;
   --blitz-gold-bright: #f59e0b;
-  --blitz-soft-bg: rgba(245, 158, 11, 0.16);
-  --blitz-soft-border: rgba(251, 191, 36, 0.35);
-  --blitz-glow: rgba(251, 191, 36, 0.4);
+  --blitz-soft-bg: rgba(245, 158, 11, 0.18);
+  --blitz-soft-border: rgba(251, 191, 36, 0.4);
+  --blitz-glow: rgba(251, 191, 36, 0.45);
   --flame-accent: #fb7185;
-  --flame-soft-bg: rgba(244, 63, 94, 0.16);
-  --flame-soft-border: rgba(251, 113, 133, 0.35);
+  --flame-soft-bg: rgba(244, 63, 94, 0.18);
+  --flame-soft-border: rgba(251, 113, 133, 0.4);
 
   /* Status */
   --status-success: #34d399;
-  --status-success-bg: rgba(52, 211, 153, 0.15);
-  --status-success-border: rgba(52, 211, 153, 0.35);
+  --status-success-bg: rgba(52, 211, 153, 0.18);
+  --status-success-border: rgba(52, 211, 153, 0.4);
   --status-danger: #f87171;
-  --status-danger-bg: rgba(248, 113, 113, 0.15);
-  --status-danger-border: rgba(248, 113, 113, 0.35);
+  --status-danger-bg: rgba(248, 113, 113, 0.18);
+  --status-danger-border: rgba(248, 113, 113, 0.4);
 
   /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
-  --shadow-elevated: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.55);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-elevated: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 /* --------------------------------------------------------------------------
-   2. Reset & Global Base
+   2. Reset & Washi Paper Atmosphere
    -------------------------------------------------------------------------- */
 *,
 *::before,
@@ -170,6 +176,8 @@ body {
   height: 100%;
   width: 100%;
   background-color: var(--bg-app);
+  background-image: var(--washi-texture);
+  background-repeat: repeat;
   color: var(--text-main);
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -220,20 +228,21 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   4. Distinct Deep Top Header Bar
+   4. Deep Lacquered Top Header Bar
    -------------------------------------------------------------------------- */
 .app-top-header {
   position: sticky;
   top: 0;
   z-index: 50;
   background-color: var(--bg-header);
+  background-image: var(--washi-texture);
   color: var(--header-text);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
   transition: all 0.2s ease;
 }
 
-/* Auto-hide top header on mobile Study mode to save 54px vertical space! */
+/* Auto-hide top header on mobile Study mode to save critical vertical space! */
 @media (max-width: 767px) {
   .app-top-header.is-study-mode {
     display: none !important;
@@ -266,8 +275,8 @@ body {
 .brand-emblem {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #4f46e5 0%, #ea580c 100%);
+  border-radius: 9px;
+  background: linear-gradient(135deg, #4338ca 0%, #c2410c 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,7 +284,7 @@ body {
   font-family: var(--font-gothic);
   font-size: 0.88rem;
   font-weight: 700;
-  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 2px 10px rgba(67, 56, 202, 0.5);
 }
 
 .brand-text {
@@ -294,7 +303,7 @@ body {
 .brand-subtitle {
   font-size: 0.68rem;
   font-weight: 500;
-  color: #94a3b8;
+  color: #a8a29e;
   font-family: var(--font-gothic);
   letter-spacing: 0.05em;
 }
@@ -312,7 +321,7 @@ body {
     background: rgba(255, 255, 255, 0.08);
     padding: 4px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
   }
 
   .nav-tab-pill {
@@ -323,9 +332,9 @@ body {
     border-radius: 999px;
     border: none;
     background: transparent;
-    color: #cbd5e1;
+    color: #d6cbbe;
     font-size: 0.88rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.18s ease;
   }
@@ -336,27 +345,27 @@ body {
   }
 
   .nav-tab-pill.active-hira {
-    background: #4f46e5;
+    background: #4338ca;
     color: #ffffff;
-    box-shadow: 0 2px 10px rgba(79, 70, 229, 0.5);
+    box-shadow: 0 2px 10px rgba(67, 56, 202, 0.5);
   }
 
   .nav-tab-pill.active-kata {
-    background: #ea580c;
+    background: #c2410c;
     color: #ffffff;
-    box-shadow: 0 2px 10px rgba(234, 88, 12, 0.5);
+    box-shadow: 0 2px 10px rgba(194, 65, 12, 0.5);
   }
 
   .nav-tab-pill.active-study {
-    background: linear-gradient(135deg, #6366f1 0%, #ea580c 100%);
+    background: linear-gradient(135deg, #4338ca 0%, #c2410c 100%);
     color: #ffffff;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 4px 14px rgba(67, 56, 202, 0.5);
   }
 }
 
 .tab-counter-badge {
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 800;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.22);
@@ -378,9 +387,9 @@ body {
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  color: #e6ddcd;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -394,7 +403,7 @@ body {
 
 .font-active-tag {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
 }
 
@@ -415,7 +424,7 @@ body {
 
 .clear-count-tag {
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 800;
   padding: 0 0.35rem;
   border-radius: 999px;
   background: rgba(239, 68, 68, 0.35);
@@ -455,6 +464,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   max-width: 440px;
   margin: 0 auto;
   background: var(--bg-dock);
+  background-image: var(--washi-texture);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1.5px solid var(--border-medium);
@@ -522,7 +532,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   background: var(--kata-soft-bg);
 }
 
-/* Elevated Drill Button in Mobile Dock */
+/* Elevated Study Button in Mobile Dock */
 .dock-study-btn {
   padding: 0;
 }
@@ -535,7 +545,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   border-radius: 999px;
   background: var(--bg-surface-hover);
   color: var(--text-secondary);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.85rem;
   border: 1px solid var(--border-medium);
   transition: all 0.2s ease;
@@ -641,10 +651,10 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 .script-count-chip {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
   background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
+  border: 1.5px solid var(--border-medium);
   padding: 0.25rem 0.8rem;
   border-radius: 999px;
   box-shadow: var(--shadow-xs);
@@ -741,6 +751,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 .cat-count-bubble {
   font-size: 0.72rem;
+  font-weight: 800;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.08);
@@ -752,7 +763,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 /* --------------------------------------------------------------------------
-   7. Kana Column Decks & Tactile Tiles
+   7. Kana Column Decks & Tactile Tiles (Desktop + Compact Mobile)
    -------------------------------------------------------------------------- */
 .kana-decks-viewport {
   width: 100%;
@@ -768,6 +779,12 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   min-width: 100%;
 }
 
+@media (max-width: 767px) {
+  .kana-decks-container {
+    gap: 0.45rem; /* Tight, agile spacing on mobile */
+  }
+}
+
 @media (min-width: 768px) {
   .kana-decks-container {
     gap: 1rem;
@@ -781,7 +798,13 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   flex-shrink: 0;
 }
 
-/* Distinct Column Deck Header Button */
+@media (max-width: 767px) {
+  .kana-column-deck {
+    gap: 0.35rem;
+  }
+}
+
+/* Column Deck Header Button */
 .column-deck-header {
   padding: 0.45rem 0.5rem;
   border-radius: 12px;
@@ -798,13 +821,20 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   transition: all 0.15s ease;
 }
 
+@media (max-width: 767px) {
+  .column-deck-header {
+    padding: 0.3rem 0.35rem;
+    font-size: 0.72rem;
+    border-radius: 8px;
+  }
+}
+
 .column-deck-header:hover {
   background: var(--bg-surface-hover);
   border-color: var(--border-strong);
   color: var(--text-main);
 }
 
-/* Selected Column Header Highlights */
 .script-hiragana .column-deck-header.col-all-selected {
   background: var(--hira-primary);
   color: #ffffff;
@@ -839,10 +869,16 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   gap: 0.5rem;
 }
 
-/* Tactile Kana Tile */
+@media (max-width: 767px) {
+  .column-deck-tiles {
+    gap: 0.35rem;
+  }
+}
+
+/* Tactile Kana Tile: Laptop vs. Mobile */
 .kana-card-tile {
-  width: 54px;
-  height: 64px;
+  width: 58px;
+  height: 68px;
   background: var(--bg-surface);
   border: 1.5px solid var(--border-medium);
   border-radius: 14px;
@@ -861,6 +897,16 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
     width: 62px;
     height: 72px;
     border-radius: 16px;
+  }
+}
+
+/* Sleek, agile proportion on mobile (no longer bulky!) */
+@media (max-width: 767px) {
+  .kana-card-tile {
+    width: clamp(40px, 11vw, 46px);
+    height: clamp(48px, 13.5vw, 56px);
+    border-radius: 10px;
+    box-shadow: var(--shadow-xs);
   }
 }
 
@@ -884,14 +930,14 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 }
 
 .tile-kana {
-  font-size: 1.45rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-main);
 }
 
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .tile-kana {
-    font-size: 1.65rem;
+    font-size: clamp(1.15rem, 3.8vw, 1.35rem);
   }
 }
 
@@ -900,6 +946,12 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   color: var(--text-muted);
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+@media (max-width: 767px) {
+  .tile-romaji {
+    font-size: 0.65rem;
+  }
 }
 
 /* Rich Saturated Selection States */
@@ -931,17 +983,17 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 .tile-selection-indicator {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 6px;
-  height: 6px;
+  top: 4px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background-color: #ffffff;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
 }
 
 /* --------------------------------------------------------------------------
-   8. Study Arena & Rock-Solid Keyboard Fit
+   8. Study Arena & Dynamic Adaptive Viewport
    -------------------------------------------------------------------------- */
 .study-zen-layout {
   display: flex;
@@ -960,14 +1012,14 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   .study-zen-layout {
     height: 100dvh;
     max-height: 100dvh;
-    padding: 0.5rem 0.75rem 0.75rem;
+    padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
     overflow: hidden;
-    gap: 0.5rem;
-    justify-content: flex-start;
+    gap: 0.45rem;
+    justify-content: space-between;
   }
 }
 
-/* Top Floating HUD Bar */
+/* Zen Calligrapher Top HUD Bar */
 .study-hud-bar {
   width: 100%;
   background: var(--bg-surface);
@@ -984,8 +1036,16 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .study-hud-bar {
-    padding: 0.3rem 0.65rem;
+    padding: 0.35rem 0.65rem;
     gap: 0.4rem;
+    flex-wrap: nowrap; /* Single un-wrapped line on mobile */
+  }
+
+  /* Hide direct Blitz & Weak spots buttons from HUD on mobile (they are inside drawer ⚙) */
+  .hud-controls-section .blitz-pill,
+  .hud-controls-section .weak-spots-pill,
+  .hud-controls-section .hud-metric-chip:not(:first-of-type) {
+    display: none !important;
   }
 }
 
@@ -994,7 +1054,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   align-items: center;
   gap: 0.65rem;
   flex: 1;
-  min-width: 130px;
+  min-width: 120px;
 }
 
 /* HUD Back Button */
@@ -1002,13 +1062,13 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 999px;
-  border: 1px solid var(--border-medium);
+  border: 1.5px solid var(--border-medium);
   background: var(--bg-surface-subtle);
   color: var(--text-secondary);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -1021,7 +1081,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 .hud-step-tag {
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
   white-space: nowrap;
 }
@@ -1057,11 +1117,11 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   gap: 0.35rem;
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  border: 1px solid var(--border-medium);
+  border: 1.5px solid var(--border-medium);
   background: var(--bg-surface-subtle);
   color: var(--text-secondary);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -1114,7 +1174,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   justify-content: center;
   padding: 0.35rem;
   border-radius: 999px;
-  border: 1px solid var(--border-medium);
+  border: 1.5px solid var(--border-medium);
   background: var(--bg-surface-subtle);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1177,7 +1237,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   border: 1px solid var(--border-medium);
   color: var(--text-muted);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -1186,12 +1246,12 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   width: 100%;
   background: var(--bg-surface);
   border: 1.5px solid var(--border-medium);
-  border-radius: 18px;
-  padding: 0.85rem 1.25rem;
+  border-radius: 20px;
+  padding: 1rem 1.25rem;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .drawer-row {
@@ -1200,7 +1260,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   justify-content: space-between;
   font-size: 0.85rem;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .drawer-toggle {
@@ -1217,12 +1277,53 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   border: 1px solid var(--border-medium);
   color: var(--text-main);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   outline: none;
 }
 
+.drawer-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.drawer-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-medium);
+  background: var(--bg-surface-subtle);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drawer-action-btn:hover {
+  background: var(--bg-surface-hover);
+}
+
+.drawer-action-btn.blitz-btn {
+  background: var(--blitz-soft-bg);
+  border-color: var(--blitz-soft-border);
+  color: var(--blitz-gold);
+}
+
+.drawer-action-btn.weak-btn {
+  background: var(--flame-soft-bg);
+  border-color: var(--flame-soft-border);
+  color: var(--flame-accent);
+}
+
 /* --------------------------------------------------------------------------
-   9. The Flashcard & Integrated Audio Header
+   9. The Flashcard & Dynamic Viewport Sizing
    -------------------------------------------------------------------------- */
 .study-arena {
   width: 100%;
@@ -1232,14 +1333,23 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   gap: 0.75rem;
 }
 
+@media (max-width: 767px) {
+  .study-arena {
+    flex: 1;
+    min-height: 0;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
 .study-flashcard-card {
   width: 100%;
-  min-height: 210px;
+  min-height: 230px;
   background: var(--bg-surface);
   border: 1.5px solid var(--border-medium);
-  border-radius: 24px;
+  border-radius: 26px;
   box-shadow: var(--shadow-card);
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1250,23 +1360,23 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (min-width: 640px) {
   .study-flashcard-card {
-    min-height: 250px;
-    padding: 1.25rem 1.75rem;
+    min-height: 260px;
+    padding: 1.5rem 2rem;
     border-radius: 28px;
   }
 }
 
-/* On mobile, ultra-compact height so Card + Input fits within 210px! */
+/* Dynamic proportional sizing on mobile: adapts to any screen & keyboard */
 @media (max-width: 767px) {
   .study-flashcard-card {
-    min-height: 135px;
-    max-height: 155px;
-    padding: 0.65rem 0.9rem;
+    flex: 1;
+    min-height: clamp(150px, 22dvh, 195px);
+    max-height: clamp(185px, 32dvh, 270px);
+    padding: 0.85rem 1.15rem;
     border-radius: 20px;
   }
 }
 
-/* Distinct Script Top Accent Borders */
 .study-flashcard-card.script-hiragana {
   border-top: 4px solid var(--hira-primary);
 }
@@ -1277,13 +1387,13 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 .study-flashcard-card.card-pass {
   border-color: var(--status-success);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 8px 24px rgba(4, 120, 87, 0.25);
   transform: scale(1.02);
 }
 
 .study-flashcard-card.card-fail {
   border-color: var(--status-danger);
-  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
+  box-shadow: 0 8px 24px rgba(185, 28, 28, 0.25);
   animation: shakeCard 0.32s ease-in-out;
 }
 
@@ -1333,14 +1443,14 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   letter-spacing: 0.04em;
 }
 
-/* Dedicated Audio Listen Pill in Card Header */
+/* Audio Listen Button in Card Header */
 .card-audio-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.65rem;
   border-radius: 999px;
-  border: 1px solid var(--border-medium);
+  border: 1.5px solid var(--border-medium);
   background: var(--bg-surface-subtle);
   color: var(--text-secondary);
   font-size: 0.75rem;
@@ -1360,9 +1470,9 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
   transform: scale(0.96);
 }
 
-/* Kana Character Hero */
+/* Main Kana Glyph Hero */
 .card-glyph-hero {
-  font-size: clamp(3rem, 10vw, 4.4rem);
+  font-size: clamp(3.2rem, 10vw, 4.5rem);
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.1;
@@ -1372,7 +1482,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .card-glyph-hero {
-    font-size: 2.85rem;
+    font-size: clamp(2.75rem, 8.5vh, 4.2rem);
     line-height: 1;
     margin: 0;
   }
@@ -1406,8 +1516,8 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .continuous-stroke-char {
-    width: 34px;
-    height: 34px;
+    width: clamp(34px, 5.5vh, 46px);
+    height: clamp(34px, 5.5vh, 46px);
   }
 }
 
@@ -1474,8 +1584,8 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .study-hero-input {
-    height: 44px;
-    font-size: 1.1rem;
+    height: clamp(44px, 6.5vh, 50px);
+    font-size: 1.15rem;
     padding: 0 1.25rem;
   }
 }
@@ -1569,7 +1679,7 @@ body:has(.study-hero-input:focus) .mobile-bottom-dock {
 
 @media (max-width: 767px) {
   .study-shortcuts-footer {
-    display: none; /* Hide on mobile to protect keyboard budget */
+    display: none; /* Hide on mobile to protect keyboard space */
   }
 }
 
