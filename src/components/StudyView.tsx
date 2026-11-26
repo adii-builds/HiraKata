@@ -227,12 +227,32 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
   // Current Card
   const currentCard: KanaItem | undefined = deck[currentIndex];
 
-  // Auto-focus input
+  // Auto-focus input (Desktop only — on mobile, avoid focusing DOM input so Android IME is never summoned)
   useEffect(() => {
     if (!isCompleted && !showBlitzSummary && feedbackState === 'idle') {
-      inputRef.current?.focus();
+      if (!isMobile) {
+        inputRef.current?.focus();
+      }
     }
-  }, [currentIndex, isCompleted, showBlitzSummary, feedbackState]);
+  }, [currentIndex, isCompleted, showBlitzSummary, feedbackState, isMobile]);
+
+  // Prevent Android from restoring soft keyboard when returning from Recent Apps
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const suppressSoftKeyboard = () => {
+      if (document.activeElement instanceof HTMLElement && document.activeElement.tagName === 'INPUT') {
+        document.activeElement.blur();
+      }
+    };
+
+    document.addEventListener('visibilitychange', suppressSoftKeyboard);
+    window.addEventListener('focus', suppressSoftKeyboard);
+    return () => {
+      document.removeEventListener('visibilitychange', suppressSoftKeyboard);
+      window.removeEventListener('focus', suppressSoftKeyboard);
+    };
+  }, [isMobile]);
 
   // Handle Correct Answer
   const handleCorrect = useCallback(() => {
@@ -787,98 +807,103 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
 
       {/* Central Flashcard Arena */}
       <div className="study-arena">
-        <div
-          className={`study-flashcard-card ${
-            feedbackState === 'correct' ? 'card-pass' : feedbackState === 'mistake' ? 'card-fail' : ''
-          } script-${currentCard?.script}`}
-        >
-          {/* Card Meta Header */}
-          <div className="card-meta-tags">
-            <div className="meta-tags-left">
-              <span className={`tag-script script-${currentCard?.script}`}>
-                {currentCard?.script.toUpperCase()}
-              </span>
-              <span className="tag-category">{currentCard?.category.toUpperCase()}</span>
-            </div>
-
-            {/* Dedicated Audio Listen Button in header */}
-            <button
-              type="button"
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => currentCard && speakKana(currentCard.char)}
-              className="card-audio-pill"
-              title="Listen to Japanese pronunciation (Ctrl+Enter)"
-              aria-label="Listen to Japanese pronunciation"
-            >
-              <Volume2 size={15} />
-              <span className="audio-label">Listen</span>
-            </button>
-          </div>
-
-          {/* Main Kana Glyph */}
-          <div className={`card-glyph-hero ${fontClass}`}>
-            {currentCard?.char}
-          </div>
-
-          {/* Calligraphic Stroke Order Animation directly under character */}
-          {currentCard && (
-            <div className="card-stroke-display">
-              <ContinuousStrokeAnimation char={currentCard.char} />
-            </div>
-          )}
-        </div>
-
-        {/* Dynamic Response Field Dock */}
-        <div className="study-response-dock">
-          {feedbackState === 'mistake' && !isBlitzMode ? (
-            <div className="mistake-alert-pill">
-              <div className="mistake-info">
-                <XCircle size={18} className="text-danger" />
-                <div className="mistake-text-group">
-                  <div className="mistake-main-ans">
-                    Answer: <strong>{currentCard?.char} = {mistakeAnswer}</strong>
-                    {currentCard?.romajiAnswers.length && currentCard.romajiAnswers.length > 1
-                      ? ` (${currentCard.romajiAnswers.filter(a => a !== mistakeAnswer).join(', ')})`
-                      : ''}
-                  </div>
-                  <span className="mistake-tip">Logged to Weak Spots • Tab or Enter to continue</span>
-                </div>
+        {/* Centered Flashcard & Dynamic Response Group */}
+        <div className="study-card-block">
+          <div
+            className={`study-flashcard-card ${
+              feedbackState === 'correct' ? 'card-pass' : feedbackState === 'mistake' ? 'card-fail' : ''
+            } script-${currentCard?.script}`}
+          >
+            {/* Card Meta Header */}
+            <div className="card-meta-tags">
+              <div className="meta-tags-left">
+                <span className={`tag-script script-${currentCard?.script}`}>
+                  {currentCard?.script.toUpperCase()}
+                </span>
+                <span className="tag-category">{currentCard?.category.toUpperCase()}</span>
               </div>
+
+              {/* Dedicated Audio Listen Button in header */}
               <button
                 type="button"
-                onClick={advanceAfterMistake}
-                className="mistake-skip-pill"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => currentCard && speakKana(currentCard.char)}
+                className="card-audio-pill"
+                title="Listen to Japanese pronunciation (Ctrl+Enter)"
+                aria-label="Listen to Japanese pronunciation"
               >
-                <span>Continue</span>
-                <ArrowRight size={14} />
+                <Volume2 size={15} />
+                <span className="audio-label">Listen</span>
               </button>
             </div>
-          ) : (
-            <div className="input-pill-wrapper">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder={
-                  isBlitzMode
-                    ? kanaConversion
-                      ? `⚡ Type in ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}...`
-                      : '⚡ Quick rōmaji...'
-                    : kanaConversion
-                    ? `Type in rōmaji (converts to ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'})...`
-                    : 'Type the rōmaji equivalent...'
-                }
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                autoComplete="off"
-                inputMode={isMobile ? 'none' : 'text'}
-                className="study-hero-input"
-              />
+
+            {/* Main Kana Glyph */}
+            <div className={`card-glyph-hero ${fontClass}`}>
+              {currentCard?.char}
             </div>
-          )}
+
+            {/* Calligraphic Stroke Order Animation directly under character */}
+            {currentCard && (
+              <div className="card-stroke-display">
+                <ContinuousStrokeAnimation char={currentCard.char} />
+              </div>
+            )}
+          </div>
+
+          {/* Dynamic Response Field Dock */}
+          <div className="study-response-dock">
+            {feedbackState === 'mistake' && !isBlitzMode ? (
+              <div className="mistake-alert-pill">
+                <div className="mistake-info">
+                  <XCircle size={18} className="text-danger" />
+                  <div className="mistake-text-group">
+                    <div className="mistake-main-ans">
+                      Answer: <strong>{currentCard?.char} = {mistakeAnswer}</strong>
+                      {currentCard?.romajiAnswers.length && currentCard.romajiAnswers.length > 1
+                        ? ` (${currentCard.romajiAnswers.filter(a => a !== mistakeAnswer).join(', ')})`
+                        : ''}
+                    </div>
+                    <span className="mistake-tip">Logged to Weak Spots • Tab or Enter to continue</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={advanceAfterMistake}
+                  className="mistake-skip-pill"
+                >
+                  <span>Continue</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            ) : (
+              <div className="input-pill-wrapper">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder={
+                    isBlitzMode
+                      ? kanaConversion
+                        ? `⚡ Type in ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'}...`
+                        : '⚡ Quick rōmaji...'
+                      : kanaConversion
+                      ? `Type in rōmaji (converts to ${currentCard?.script === 'katakana' ? 'カタカナ' : 'かな'})...`
+                      : 'Type the rōmaji equivalent...'
+                  }
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="off"
+                  readOnly={isMobile}
+                  tabIndex={isMobile ? -1 : 0}
+                  inputMode={isMobile ? 'none' : 'text'}
+                  className="study-hero-input"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* In-Page Virtual Keyboard (Permanent & static directly below card on mobile, 0 jumping) */}
