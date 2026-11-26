@@ -37,8 +37,6 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     setFontPreference,
     autoAdvance,
     setAutoAdvance,
-    audioEnabled,
-    setAudioEnabled,
     toggleColumn,
   } = useKanaStore();
 
@@ -99,12 +97,6 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     }
   }, [currentIndex, isCompleted, feedbackState]);
 
-  // Auto-play audio if enabled
-  useEffect(() => {
-    if (currentCard && audioEnabled && feedbackState === 'idle') {
-      speakKana(currentCard.char);
-    }
-  }, [currentCard, audioEnabled, feedbackState]);
 
   // Handle Correct Answer
   const handleCorrect = useCallback(() => {
@@ -367,14 +359,6 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             />
           </div>
           <div className="option-row">
-            <span>Audio pronunciation</span>
-            <input
-              type="checkbox"
-              checked={audioEnabled}
-              onChange={e => setAudioEnabled(e.target.checked)}
-            />
-          </div>
-          <div className="option-row">
             <span>Japanese Font</span>
             <select
               value={fontPreference}
@@ -409,14 +393,17 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
             {currentCard?.char}
           </div>
 
-          {/* Sound Replay button */}
+          {/* Dedicated Audio Play Button (plays only when pressed) */}
           <button
             type="button"
+            onMouseDown={e => e.preventDefault()}
             onClick={() => currentCard && speakKana(currentCard.char)}
             className="glyph-audio-btn"
-            title="Hear pronunciation"
+            title="Play pronunciation"
+            aria-label="Play pronunciation"
           >
-            <Volume2 size={20} />
+            <Volume2 size={18} />
+            <span className="audio-btn-label">Listen</span>
           </button>
         </div>
 
