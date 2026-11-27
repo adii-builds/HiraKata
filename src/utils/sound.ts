@@ -5,7 +5,9 @@ let audioCtx: AudioContext | null = null;
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
     }
@@ -70,25 +72,133 @@ export function playMistakeChime() {
   }
 }
 
-// Japanese speech synthesis for the kana
+// Persistent active utterances set to prevent V8 Garbage Collection in Chromium
+const activeUtterances = new Set<SpeechSynthesisUtterance>();
+let cachedJaVoice: SpeechSynthesisVoice | null = null;
+let engineWarmedUp = false;
+
+// Proactively query and cache the Japanese voice
+function loadJapaneseVoice(): SpeechSynthesisVoice | null {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+  try {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      const ja =
+        voices.find(v => v.lang === 'ja-JP' || v.lang === 'ja_JP') ||
+        voices.find(v => v.lang.toLowerCase().startsWith('ja') || v.lang.toLowerCase().includes('jp'));
+      if (ja) {
+        cachedJaVoice = ja;
+        return ja;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return cachedJaVoice;
+}
+
+// Register voice loader immediately on script evaluation
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  loadJapaneseVoice();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      loadJapaneseVoice();
+    };
+  }
+}
+
+// Pre-warm the native mobile/Android TTS background engine
+export function warmUpSpeechEngine() {
+  if (typeof window === 'undefined' || !window.speechSynthesis || engineWarmedUp) return;
+  engineWarmedUp = true;
+
+  try {
+    const synth = window.speechSynthesis;
+    if (synth.paused) {
+      synth.resume();
+    }
+    loadJapaneseVoice();
+
+    // Silent minimal utterance to wake up native Android TTS background service
+    const silent = new SpeechSynthesisUtterance('');
+    silent.volume = 0;
+    silent.rate = 2.0;
+    activeUtterances.add(silent);
+    silent.onend = () => activeUtterances.delete(silent);
+    silent.onerror = () => activeUtterances.delete(silent);
+    synth.speak(silent);
+  } catch {
+    // ignore
+  }
+}
+
+// Automatically listen for first user interaction (touch, click, keydown) to warm up
+if (typeof window !== 'undefined') {
+  const onFirstInteraction = () => {
+    warmUpSpeechEngine();
+    window.removeEventListener('click', onFirstInteraction);
+    window.removeEventListener('touchstart', onFirstInteraction);
+    window.removeEventListener('keydown', onFirstInteraction);
+  };
+  window.addEventListener('click', onFirstInteraction, { passive: true, once: true });
+  window.addEventListener('touchstart', onFirstInteraction, { passive: true, once: true });
+  window.addEventListener('keydown', onFirstInteraction, { passive: true, once: true });
+}
+
+// Robust Japanese speech synthesis for the kana
 export function speakKana(char: string) {
   try {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
-    window.speechSynthesis.cancel(); // Stop any pending speech
-    const utterance = new SpeechSynthesisUtterance(char);
-    utterance.lang = 'ja-JP';
-    utterance.rate = 0.95;
-    utterance.volume = 0.85;
+    const synth = window.speechSynthesis;
 
-    // Try finding a Japanese voice
-    const voices = window.speechSynthesis.getVoices();
-    const jaVoice = voices.find(v => v.lang.startsWith('ja') || v.lang.includes('JP'));
-    if (jaVoice) {
-      utterance.voice = jaVoice;
+    // 1. Unpause if stuck in paused state on mobile
+    if (synth.paused) {
+      synth.resume();
     }
 
-    window.speechSynthesis.speak(utterance);
+    // 2. Query/refresh voice if not yet cached
+    const jaVoice = loadJapaneseVoice();
+
+    const doSpeak = () => {
+      try {
+        const utterance = new SpeechSynthesisUtterance(char);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.95;
+        utterance.volume = 1.0;
+
+        if (jaVoice) {
+          utterance.voice = jaVoice;
+        }
+
+        // Prevent V8 garbage collection while queued/playing
+        activeUtterances.add(utterance);
+        utterance.onend = () => {
+          activeUtterances.delete(utterance);
+        };
+        utterance.onerror = () => {
+          activeUtterances.delete(utterance);
+        };
+
+        synth.speak(utterance);
+
+        // Mobile Chromium quirk: force unpause if browser queued it as paused
+        if (synth.paused) {
+          synth.resume();
+        }
+      } catch {
+        // speech error fallback
+      }
+    };
+
+    // 3. Avoid synchronous cancel-vs-speak race in Chromium
+    if (synth.speaking || synth.pending) {
+      synth.cancel();
+      // Allow 25ms buffer for native cancel to settle before queuing new utterance
+      setTimeout(doSpeak, 25);
+    } else {
+      doSpeak();
+    }
   } catch {
     // Speech synthesis error fallback
   }

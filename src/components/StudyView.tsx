@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { KanaItem, hiraganaSingleColumns, katakanaSingleColumns } from '../data/kanaData';
 import { useKanaStore } from '../store/useKanaStore';
-import { playSuccessChime, playMistakeChime, speakKana } from '../utils/sound';
+import { playSuccessChime, playMistakeChime, speakKana, warmUpSpeechEngine } from '../utils/sound';
 import { romajiToKana } from '../utils/kanaIme';
 import confetti from 'canvas-confetti';
 import { ContinuousStrokeAnimation } from './ContinuousStrokeAnimation';
@@ -106,6 +106,10 @@ export const StudyView: React.FC<StudyViewProps> = ({ onGoToTab }) => {
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    warmUpSpeechEngine();
   }, []);
 
   // Initialize or restart study session
